@@ -1,10 +1,6 @@
 package by.draughts.model;
 
-import org.json.JSONArray;
-
-import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 /*@Entity
 @Table(name = "games")*/
@@ -13,18 +9,15 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO)*/
     private String id;
 
-    private String event;
-    private String site;
-    private Date date;
-    private int round;
+    private Metadata metadata;
+
     private String white;
     private String black;
     private GameResult result;
     private int gameType;
 
-    private Position beginPosition;
-    private Ply firstMove;
-    private List<Ply> alternatives;
+    private Position begin;
+    private Sequence mainMoves;
 
     public Game() {
     }
@@ -37,36 +30,20 @@ public class Game {
         this.id = id;
     }
 
-    public String getEvent() {
-        return event;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
-    public void setEvent(String event) {
-        this.event = event;
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
     }
 
-    public String getSite() {
-        return site;
+    public Sequence getMainMoves() {
+        return mainMoves;
     }
 
-    public void setSite(String site) {
-        this.site = site;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public int getRound() {
-        return round;
-    }
-
-    public void setRound(int round) {
-        this.round = round;
+    public void setMainMoves(Sequence mainMoves) {
+        this.mainMoves = mainMoves;
     }
 
     public String getWhite() {
@@ -101,29 +78,11 @@ public class Game {
         this.gameType = gameType;
     }
 
-    public Position getBeginPosition() {
-        return beginPosition;
+    public Position getBegin() {
+        return begin;
     }
 
-    public void setBeginPosition(Position beginPosition) {
-        this.beginPosition = beginPosition;
-    }
-
-    public Ply getFirstMove() {
-        return firstMove;
-    }
-
-    public void setFirstMove(Ply firstMove) {
-        this.firstMove = firstMove;
-    }
-
-    public JSONArray generateMoves() {
-        JSONArray movesLine = new JSONArray();
-        firstMove.addToMovesJson(movesLine);
-        /*if (alternatives != null) {
-            for (Ply ply : alternatives)
-                moves += ply.toStringPly();
-        }*/
-        return movesLine;//.toString();
+    public void setBegin(Position begin) {
+        this.begin = begin;
     }
 }

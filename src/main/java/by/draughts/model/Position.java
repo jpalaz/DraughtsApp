@@ -3,43 +3,43 @@ package by.draughts.model;
 import java.util.List;
 
 public class Position {
-    private List<Integer> whites;
-    private List<Integer> whiteKings;
-    private List<Integer> blacks;
-    private List<Integer> blackKings;
+    private List<Byte> whites;
+    private List<Byte> whiteKings;
+    private List<Byte> blacks;
+    private List<Byte> blackKings;
 
     public Position() {
     }
 
-    public List<Integer> getWhites() {
+    public List<Byte> getWhites() {
         return whites;
     }
 
-    public void setWhites(List<Integer> whites) {
+    public void setWhites(List<Byte> whites) {
         this.whites = whites;
     }
 
-    public List<Integer> getWhiteKings() {
+    public List<Byte> getWhiteKings() {
         return whiteKings;
     }
 
-    public void setWhiteKings(List<Integer> whiteKings) {
+    public void setWhiteKings(List<Byte> whiteKings) {
         this.whiteKings = whiteKings;
     }
 
-    public List<Integer> getBlacks() {
+    public List<Byte> getBlacks() {
         return blacks;
     }
 
-    public void setBlacks(List<Integer> blacks) {
+    public void setBlacks(List<Byte> blacks) {
         this.blacks = blacks;
     }
 
-    public List<Integer> getBlackKings() {
+    public List<Byte> getBlackKings() {
         return blackKings;
     }
 
-    public void setBlackKings(List<Integer> blackKings) {
+    public void setBlackKings(List<Byte> blackKings) {
         this.blackKings = blackKings;
     }
 }

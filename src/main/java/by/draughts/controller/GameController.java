@@ -1,17 +1,11 @@
 package by.draughts.controller;
 
-import by.draughts.model.Game;
-import by.draughts.model.GameResult;
-import by.draughts.model.Ply;
-import by.draughts.model.Position;
+import by.draughts.model.*;
 import by.draughts.service.GameService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 @RestController
@@ -24,53 +18,62 @@ public class GameController {
 
     static {
         game = new Game();
+        Metadata metadata = new Metadata();
+        metadata.setDate(new Date());
+        metadata.setEvent("Belarus Highest League 2015");
+        metadata.setSite("Minsk");
+        metadata.setRound(1);
+
+        game.setMetadata(metadata);
         game.setBlack("Black");
         game.setWhite("White");
-        game.setDate(new Date());
-        game.setEvent("Belarus Highest League 2015");
         game.setGameType(25);
         game.setId("1");
         game.setResult(GameResult.BLACK_WON);
-        game.setSite("Minsk");
-        game.setBeginPosition(new Position());
-        game.setRound(1);
+        game.setBegin(new Position());
 
-        Ply first = new Ply();
-        game.setFirstMove(first);
+        Ply ply = new Ply(new PlyMetadata());
+        game.setMainMoves(new Sequence());
+        game.getMainMoves().add(ply);
 
-        first.setFrom(22);
-        first.setTo(18);
-        first.setPosition(new Position());
-        first.setNumber(1);
+        ply.getMetadata().setFrom((byte)22);
+        ply.getMetadata().setTo((byte)18);
+        ply.setPosition(new Position());
+        ply.getMetadata().setNumber((byte)1);
 
-        ArrayList<Integer> draughts = new ArrayList<>();
-        for (int i = 21; i <= 32; ++i) {
+        ply.setComment(new Comment());
+        ply.getComment().setCommentBefore("Comment before first ply");
+        ply.getComment().setCommentAfter("Comment after first ply");
+        ply.getComment().setRate(PlyRate.GOOD);
+
+        ArrayList<Byte> draughts = new ArrayList<>();
+        for (byte i = 21; i <= 32; ++i) {
             draughts.add(i);
         }
-        game.getBeginPosition().setWhites(draughts);
+        game.getBegin().setWhites(draughts);
 
         draughts = new ArrayList<>(draughts);
-        draughts.set(1, 18);
-        first.getPosition().setWhites(draughts);
+        draughts.set((byte)1, (byte)18);
+        ply.getPosition().setWhites(draughts);
 
         draughts = new ArrayList<>();
-        for (int i = 1; i <= 12; ++i) {
+        for (byte i = 1; i <= 12; ++i) {
             draughts.add(i);
         }
-        game.getBeginPosition().setBlacks(draughts);
+        game.getBegin().setBlacks(draughts);
 
-        first.getPosition().setBlacks(new ArrayList<>(draughts));
+        ply.getPosition().setBlacks(new ArrayList<>(draughts));
     }
 
-    @RequestMapping(value = "/{gameId}", method = RequestMethod.GET)
-    public Game getGame(@PathVariable String gameId) {
+    @RequestMapping(method = RequestMethod.GET)
+    public Game getGame() {
         return game;
         //return gameService.getGameById(gameId);
     }
 
     @RequestMapping(value = "/{gameId}/moves", method = RequestMethod.GET)
-    public String getMoves(@PathVariable String gameId) {
-        return game.generateMoves().toString();
+    public Game getMoves(@PathVariable String gameId) {
+        return game;
         //return gameService.getGameById(gameId);
     }
 }
