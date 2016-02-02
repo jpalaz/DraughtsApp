@@ -1,4 +1,4 @@
-package by.draughts.model;
+package by.draughts.model.ply;
 
 public class PlyMetadata {
     private short number;

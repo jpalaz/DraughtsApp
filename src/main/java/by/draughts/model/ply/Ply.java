@@ -1,4 +1,6 @@
-package by.draughts.model;
+package by.draughts.model.ply;
+
+import by.draughts.model.game.Position;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package by.draughts.service;
 
-import by.draughts.model.Game;
+import by.draughts.model.game.Game;
 
 public interface GameService {
 

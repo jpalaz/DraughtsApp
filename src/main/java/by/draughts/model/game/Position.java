@@ -1,4 +1,4 @@
-package by.draughts.model;
+package by.draughts.model.game;
 
 import java.util.List;
 
