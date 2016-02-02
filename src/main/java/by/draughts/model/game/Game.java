@@ -10,12 +10,8 @@ public class Game {
     private String id;
 
     private GameMetadata metadata;
-
-    private String white;
-    private String black;
-    private GameResult result;
+    private GameTitle title;
     private int gameType;
-
     private Position begin;
     private Sequence mainMoves;
 
@@ -46,28 +42,12 @@ public class Game {
         this.mainMoves = mainMoves;
     }
 
-    public String getWhite() {
-        return white;
+    public GameTitle getTitle() {
+        return title;
     }
 
-    public void setWhite(String white) {
-        this.white = white;
-    }
-
-    public String getBlack() {
-        return black;
-    }
-
-    public void setBlack(String black) {
-        this.black = black;
-    }
-
-    public GameResult getResult() {
-        return result;
-    }
-
-    public void setResult(GameResult result) {
-        this.result = result;
+    public void setTitle(GameTitle title) {
+        this.title = title;
     }
 
     public int getGameType() {

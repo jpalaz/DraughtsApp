@@ -1,10 +1,8 @@
 package by.draughts.controller;
 
-import by.draughts.model.game.Game;
-import by.draughts.model.game.GameResult;
-import by.draughts.model.game.GameMetadata;
-import by.draughts.model.game.Position;
+import by.draughts.model.game.*;
 import by.draughts.model.ply.*;
+import by.draughts.model.tournament.Player;
 import by.draughts.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +25,13 @@ public class GameController {
         metadata.setEvent("Belarus Highest League 2015");
         metadata.setSite("Minsk");
         metadata.setRound(1);
-
         game.setMetadata(metadata);
-        game.setBlack("Black");
-        game.setWhite("White");
+
+        GameTitle title = new GameTitle(new Player("I'm white and fluffy"), new Player("Black Sirius"));
+        game.setTitle(title);
+
         game.setGameType(25);
         game.setId("1");
-        game.setResult(GameResult.BLACK_WON);
         game.setBegin(new Position());
 
         Ply ply = new Ply(new PlyMetadata());
