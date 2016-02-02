@@ -1,6 +1,10 @@
 package by.draughts.controller;
 
-import by.draughts.model.*;
+import by.draughts.model.game.Game;
+import by.draughts.model.game.GameResult;
+import by.draughts.model.game.GameMetadata;
+import by.draughts.model.game.Position;
+import by.draughts.model.ply.*;
 import by.draughts.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +22,7 @@ public class GameController {
 
     static {
         game = new Game();
-        Metadata metadata = new Metadata();
+        GameMetadata metadata = new GameMetadata();
         metadata.setDate(new Date());
         metadata.setEvent("Belarus Highest League 2015");
         metadata.setSite("Minsk");

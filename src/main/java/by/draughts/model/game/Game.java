@@ -1,6 +1,6 @@
-package by.draughts.model;
+package by.draughts.model.game;
 
-import java.util.Date;
+import by.draughts.model.ply.Sequence;
 
 /*@Entity
 @Table(name = "games")*/
@@ -9,7 +9,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO)*/
     private String id;
 
-    private Metadata metadata;
+    private GameMetadata metadata;
 
     private String white;
     private String black;
@@ -30,11 +30,11 @@ public class Game {
         this.id = id;
     }
 
-    public Metadata getMetadata() {
+    public GameMetadata getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Metadata metadata) {
+    public void setMetadata(GameMetadata metadata) {
         this.metadata = metadata;
     }
 

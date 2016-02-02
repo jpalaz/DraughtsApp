@@ -1,14 +1,14 @@
-package by.draughts.model;
+package by.draughts.model.game;
 
 import java.util.Date;
 
-public class Metadata {
+public class GameMetadata {
     private String event;
     private String site;
     private Date date;
     private int round;
 
-    public Metadata() {
+    public GameMetadata() {
     }
 
     public String getEvent() {
