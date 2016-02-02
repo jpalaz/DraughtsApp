@@ -1,52 +1,64 @@
 package by.draughts.model.ply;
 
-public class PlyMetadata {
-    private short number;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PlyMetadata{
     private byte from;
     private byte to;
-    private boolean isWhiteSide;
+    private List<Byte> intermediats;
     private boolean isBeat;
 
-    public PlyMetadata() {
+    public PlyMetadata(){
+        isBeat = false;
     }
 
-    public short getNumber() {
-        return number;
+    public PlyMetadata(PlyMetadata obj){
+        from = obj.from;
+        to = obj.to;
+        isBeat = obj.isBeat;
+        if(obj.intermediats != null){
+            intermediats = new ArrayList<>( obj.intermediats );
+        }
     }
 
-    public void setNumber(short number) {
-        this.number = number;
+    public List<Byte> getIntermediats(){
+        return intermediats;
     }
 
-    public byte getFrom() {
+    public void setIntermediats(List<Byte> intermediats){
+        this.intermediats = intermediats;
+    }
+
+    public void addIntermediat(byte intermediat){
+        intermediats.add( intermediat );
+    }
+
+    public void setIsBeat(boolean isBeat){
+        this.isBeat = isBeat;
+    }
+
+    public byte getFrom(){
         return from;
     }
 
-    public void setFrom(byte from) {
+    public void setFrom(byte from){
         this.from = from;
     }
 
-    public byte getTo() {
+    public byte getTo(){
         return to;
     }
 
-    public void setTo(byte to) {
+    public void setTo(byte to){
         this.to = to;
     }
 
-    public boolean isWhiteSide() {
-        return isWhiteSide;
-    }
-
-    public void setWhiteSide(boolean whiteSide) {
-        this.isWhiteSide = whiteSide;
-    }
-
-    public boolean isBeat() {
+    public boolean isBeat(){
         return isBeat;
     }
 
-    public void setBeat(boolean beat) {
+    public void setBeat(boolean beat){
         this.isBeat = beat;
     }
 }

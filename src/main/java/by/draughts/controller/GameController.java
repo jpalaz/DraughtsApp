@@ -4,6 +4,7 @@ import by.draughts.model.game.*;
 import by.draughts.model.ply.*;
 import by.draughts.model.tournament.Player;
 import by.draughts.service.GameService;
+import by.draughts.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,9 @@ import java.util.Date;
 public class GameController {
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private PositionService positionService;
 
     private static Game game;
 
@@ -77,6 +81,7 @@ public class GameController {
         game.getBegin().setBlacks(draughts);
 
         ply.getPosition().setBlacks(new ArrayList<>(draughts));
+
     }
 
     private static void setSecondPly(Ply ply) {

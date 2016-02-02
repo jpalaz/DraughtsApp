@@ -5,6 +5,7 @@ import by.draughts.model.game.Position;
 import java.util.List;
 
 public class Ply {
+    private short number;
     private PlyMetadata metadata;
     private Position position;
     private Comment comment;
@@ -15,6 +16,14 @@ public class Ply {
 
     public Ply(PlyMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    public short getNumber(){
+        return number;
+    }
+
+    public void setNumber(short number){
+        this.number = number;
     }
 
     public PlyMetadata getMetadata() {
