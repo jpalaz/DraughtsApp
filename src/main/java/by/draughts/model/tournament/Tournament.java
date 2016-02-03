@@ -1,8 +1,11 @@
 package by.draughts.model.tournament;
 
+import by.draughts.dto.tournament.PlayerDTO;
+import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.exception.NoSuchRoundException;
 import by.draughts.model.game.GameTitle;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +23,22 @@ public class Tournament {
     private List<Player> players;
 
     public Tournament() {
+    }
+
+    public Tournament(TournamentDTO tournamentDTO) {
+        name = tournamentDTO.getName();
+        place = tournamentDTO.getPlace();
+        arbiter = tournamentDTO.getArbiter();
+        roundAmount = tournamentDTO.getRoundAmount();
+        currentRound = tournamentDTO.getCurrentRound();
+        begin = tournamentDTO.getBegin();
+        end = tournamentDTO.getEnd();
+        system = tournamentDTO.getSystem();
+
+        players = new ArrayList<>();
+        for (PlayerDTO playerDTO : tournamentDTO.getPlayers()) {
+            players.add(new Player(playerDTO));
+        }
     }
 
     public List<GameTitle> getRoundGames(int round) throws NoSuchRoundException {

@@ -1,5 +1,8 @@
 package by.draughts.model.tournament;
 
+import by.draughts.dto.tournament.PlayerDTO;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
@@ -13,6 +16,13 @@ public class Player {
 
     public Player(String surname) {
         name = new PersonName(surname);
+    }
+
+    public Player(PlayerDTO playerDTO) {
+        name = playerDTO.getName();
+        points = playerDTO.getPoints();
+        gamesPlayed = playerDTO.getGamesPlayed();
+        rivals = new ArrayList<>();
     }
 
     public PersonName getName() {
