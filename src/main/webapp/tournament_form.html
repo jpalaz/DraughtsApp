@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tournament - Form</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <ul class="nav navbar-nav">
+            <li><a href="tournament_page.html">View tournament</a></li>
+            <li class="active"><a href="#">Create<span class="sr-only">(current)</span></a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row body">
+        <div class="side col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 col-sm-offset-1 col-sm-10 col-xs-12">
+            <form id="tournament-form" method="post" action="tournaments">
+                <div class="form-group">
+                    <label for="tournament-name">Tournament name</label>
+                    <input type="text" name="name" class="form-control" id="tournament-name" placeholder="World Championship 2016">
+                    <label for="place">Place</label>
+                    <input type="text" name="place" class="form-control" id="place" placeholder="Belarus, Minsk">
+                    <label for="arbiter">Arbiter</label>
+                    <input type="text" name="arbiter" class="form-control" id="arbiter" placeholder="Petrov">
+                    <label for="roundAmount">Amount of rounds</label>
+                    <input type="number" name="roundAmount" class="form-control" id="roundAmount" placeholder="0">
+                    <label for="begin">Begin date</label>
+                    <input type="date" name="begin" class="form-control" id="begin">
+                    <label for="end">End date</label>
+                    <input type="date" name="end" class="form-control" id="end">
+                </div>
+
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="system" id="radiosRound" value="ROUND_ROBIN" checked>
+                        Round Robin sorting
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="system" id="radioSwiss" value="SWISS" disabled>
+                        Swiss sorting
+                    </label>
+                </div>
+
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="gameType" id="radios64" value="64" checked>
+                        Draughts 64
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="gameType" id="radio100" value="100" disabled>
+                        Draughts 100
+                    </label>
+                </div>
+
+                <p><button type="button" class="add btn btn-warning">Add one more player</button></p>
+
+                <label for="players">Players</label>
+                <div id="players">
+                    <p>
+                        <label>Name</label> <input name="players" type="text">
+                        <!--<label>Age:</label> <input type="text">-->
+                        <button type="button" class="remove">Remove</button>
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-default" id="submit-form">Submit</button>
+                <p class="help-block">Redirect to <b>View</b> page after uploading.</p>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="/js/jquery.js"></script>
+<script>
+    $(".add").click(function () {
+        $("#players > p:first-child").clone(true).insertBefore("#players > p:last-child");
+        return false;
+    });
+
+    $(".remove").click(function () {
+        $(this).parent().remove();
+    });
+
+    $("#submit-form").click(function () {
+        var formData = JSON.stringify($('#tournament-form').serializeObject());
+        $.ajax({
+            type: "POST",
+            url: "tournaments",
+            data: formData,
+            success: function() {window.location.replace("tournament_page");},
+            dataType: "json",
+            contentType : "application/json"
+        });
+        return false;
+    });
+
+    $.fn.serializeObject = function() {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</html>

@@ -1,5 +1,6 @@
 package by.draughts.controller;
 
+import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.game.Game;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.tournament.Player;
@@ -8,6 +9,7 @@ import by.draughts.model.tournament.Tournament;
 import by.draughts.model.tournament.TournamentSystem;
 import by.draughts.service.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,5 +54,12 @@ public class TournamentController {
     public List<GameTitle> getTournamentNextRound() {
         tournament.setCurrentRound(tournament.getCurrentRound() + 1);
         return tournamentService.getNextRoundGames(tournament);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String createTournament(@RequestBody TournamentDTO tournamentDTO) {
+        System.out.println(tournamentDTO);
+        Tournament tournament = new Tournament(tournamentDTO);
+        return "oK!";
     }
 }
