@@ -21,7 +21,10 @@ $(function(){
                 blacks: [],
                 blackKings: []
             },
-            alternatives: []
+            alternatives: [],
+            parse: function(response) {
+
+            }
         }
     });
 
@@ -29,127 +32,130 @@ $(function(){
         model: App.Models.PlyDTO
     });
 
+    //THEN IT MUST BECOME PARSE METHOD
+    function parsePlies(response) {
+        var parsedMoves = [];
+        var moves = response["mainMoves"]["moves"];
+        for(var i = 0; i < moves.length; i++) {
+            var ply = moves[i];
+            if(!ply["alternatives"]) ply["position"]["alternatives"] = [];
+            if(!ply["position"].whites) ply["position"].whites = [];
+            if(!ply["position"].whiteKings) ply["position"].whiteKings = [];
+            if(!ply["position"].blacks) ply["position"].blacks = [];
+            if(!ply["position"].blackKings) ply["position"].blackKings = [];
+            parsedMoves.push(new App.Models.PlyDTO({
+                index: ply["metadata"]["number"],
+                commentBefore: ply["comment"]["commentBefore"],
+                commentAfter: ply["comment"]["commentAfter"],
+                rate: ply["comment"]["rate"],
+                whiteSide: ply["metadata"]["whiteSide"],
+                from: ply["metadata"]["from"],
+                to: ply["metadata"]["to"],
+                position: ply["position"],
+                alternatives: ply["alternatives"]
+            }));
+        }
+        return parsedMoves;
+    }
+
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
         currentStep: 1,
         initialize: function () {
             this.createBoard(this.brdSize);
 
-            this.collection.add(new App.Models.PlyDTO({
-                index: 1,
-                whiteSide: true,
-                from: 22,
-                to: 18,
-                position: {
-                    whites: [1,2,3,4,5,6,7,8,9,10,11,12],
-                    whiteKings: [],
-                    blacks: [32,31,30,29,28,27,26,25,24,23,22,21],
-                    blackKings: []
+            // THEN IT WILL BE FETCH METHOD
+            var game = {
+                "id": "1",
+                "metadata": {
+                    "event": "Belarus Highest League 2015",
+                    "site": "Minsk",
+                    "date": 1454349597638,
+                    "round": 1
                 },
-                alternatives: undefined
-            }));
-            this.collection.add(new App.Models.PlyDTO({
-                index: 2,
-                commentBefore: 'game starting',
-                rate: 'rate',
-                whiteSide: false,
-                from: 9,
-                to: 13,
-                position: {
-                    whites: [1,2,3,4,5,6,7,8,13,10,11,12],
-                    whiteKings: [],
-                    blacks: [32,31,30,29,28,27,26,25,24,23,22,21],
-                    blackKings: []
+                "white": "White",
+                "black": "Black",
+                "result": "BLACK_WON",
+                "gameType": 25,
+                "begin": {
+                    "whites": [21,22,23,24,25,26,27,28,29,30,31,32],
+                    "whiteKings": null,
+                    "blacks": [1,2,3,4,5,6,7,8,9,10,11,12],
+                    "blackKings": null
                 },
-                alternatives: undefined
-            }));
-            this.collection.add(new App.Models.PlyDTO({
-                index: 3,
-                whiteSide: true,
-                from: 21,
-                to: 18,
-                position: {
-                    whites: [1,2,3,4,5,6,7,8,13,10,11,12],
-                    whiteKings: [],
-                    blacks: [32,31,30,29,28,27,26,25,24,23,22,18],
-                    blackKings: []
-                },
-                alternatives: undefined
-            }));
-            this.collection.add(new App.Models.PlyDTO({
-                index: 4,
-                commentBefore: 'commentBefore',
-                commentAfter: 'commentAfter',
-                rate: 'rate',
-                whiteSide: false,
-                from: 10,
-                to: 14,
-                position: {
-                    whites: [1,2,3,4,5,6,7,8,13,14,11,12],
-                    whiteKings: [],
-                    blacks: [32,31,30,29,28,27,26,25,24,23,22,18],
-                    blackKings: []
-                },
-                alternatives: undefined
-            }));
-            this.collection.add(new App.Models.PlyDTO({
-                index: 5,
-                commentAfter: 'i dont know the difference between this and next comment,' +
-                ' how can i learn, that next comment is connected with next ply ',
-                rate: 'rate',
-                whiteSide: true,
-                from: 18,
-                to: 9,
-                position: {
-                    whites: [1,2,3,4,5,6,7,8,14,11,12],
-                    whiteKings: [],
-                    blacks: [32,31,30,29,28,27,26,25,24,23,22,9],
-                    blackKings: []
-                },
-                alternatives: undefined
-            }));
-            this.collection.add(new App.Models.PlyDTO({
-                index: 6,
-                commentBefore: 'now lets look at impossible ply',
-                commentAfter: 'WOWOWO, WHAT IS THIS?',
-                rate: 'rate',
-                whiteSide: false,
-                from: 0,
-                to: 0,
-                position: {
-                    whites: [],
-                    whiteKings: [2,3,4,5],
-                    blacks: [],
-                    blackKings: [9,10,11,14]
-                },
-                alternatives: [new App.Models.PlyDTO({
-                    index: 6,
-                    whiteSide: true,
-                    from: 22,
-                    to: 18,
-                    position: {
-                        whites: [1,2,3,4,8,9,10,11,12],
-                        whiteKings: [5],
-                        blacks: [32,31,30,29,28,24,23,22,21],
-                        blackKings: [6]
-                    },
-                    alternatives: undefined
-                }), new App.Models.PlyDTO({
-                    index: 7,
-                    whiteSide: false,
-                    from: 22,
-                    to: 18,
-                    position: {
-                        whites: [1,2,3,4,5,6],
-                        whiteKings: [32],
-                        blacks: [24,23,22,21],
-                        blackKings: [31]
-                    },
-                    alternatives: undefined
-                })]
-            }));
+                "mainMoves": {
+                    "moves": [
+                        {
+                            "metadata": {
+                                "number": 1,
+                                "from": 22,
+                                "to": 18,
+                                "whiteSide": false,
+                                "beat": false
+                            },
+                            "position": {
+                                "whites": [21,22,23,24,25,26,27,28,29,30,31,32],
+                                "whiteKings": null,
+                                "blacks": [1,2,3,4,5,6,7,8,9,10,11,12],
+                                "blackKings": null
+                            },
+                            "comment": {
+                                "commentBefore": "Comment before first ply",
+                                "commentAfter": "Comment after first ply",
+                                "rate": "GOOD"
+                            },
+                            "alternatives": null
+                        },
+                        {
+                            "metadata": {
+                                "number": 2,
+                                "from": 22,
+                                "to": 18,
+                                "whiteSide": false,
+                                "beat": false
+                            },
+                            "position": {
+                                "whites": [21,18,23,24,25,26,27,28,29,30,31,32],
+                                "whiteKings": null,
+                                "blacks": [1,2,3,4,5,6,7,8,9,10,11,12],
+                                "blackKings": null
+                            },
+                            "comment": {
+                                "commentBefore": "Comment before first ply",
+                                "commentAfter": "Comment after first ply",
+                                "rate": "GOOD"
+                            },
+                            "alternatives": null
+                        },
+                        {
+                            "metadata": {
+                                "number": 3,
+                                "from": 2,
+                                "to": 13,
+                                "whiteSide": false,
+                                "beat": false
+                            },
+                            "position": {
+                                "whites": [6],
+                                "whiteKings": [12,22],
+                                "blacks": null,
+                                "blackKings": [1,2,3,4]
+                            },
+                            "comment": {
+                                "commentBefore": "Comment before first ply23",
+                                "commentAfter": "Comment after first ply12",
+                                "rate": "BAAAD"
+                            },
+                            "alternatives": null
+                        }
+                    ]
+                }
+            };
 
-
+            var plies = parsePlies(game);
+            for(let i = 0; i < plies.length; i++) {
+                this.collection.add(plies[i]);
+            }
             this.fillGameStepsSidebar();
             this.render(1);
         },
