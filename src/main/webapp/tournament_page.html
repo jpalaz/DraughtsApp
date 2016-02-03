@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tournament - View</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/css/tournament_page.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">View<span class="sr-only">(current)</span></a></li>
+            <li><a href="index.html">Board</a></li>
+            <li><a href="tournament_form.html">New Tournament</a></li>
+        </ul>
+    </div>
+    <!-- /.container-fluid -->
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-offset-1 col-md-offset-1 col-lg-2 col-md-2 col-sm-2 col-xs-2">
+            <div class="well well-sm"><b>Players number: </b><span id="players-count"></span></div>
+            <div class="well well-sm"><b>System: </b><span id="system"></span></div>
+            <div class="well well-sm"><b>Current round: </b><span id="current-round"></span></div>
+        </div>
+
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                <h1 class="text-right">
+                    <small>Name</small>
+                    <span id="tournament-name"></span></h1>
+                <h2 class="text-right">
+                    <small>Place</small>
+                    <span id="tournament-place"></span></h2>
+                <h3 class="text-right">
+                    <small>Arbiter</small>
+                    <span id="arbiter"></span></h3>
+                <h3 class="text-right" id="date"></h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-offset-1 col-md-offset-1 col-lg-4 col-md-4 col-sm-5 col-xs-5">
+            <h3>Players</h3>
+            <table class="table table-striped table-bordered table-hover" id="players">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Games</th>
+                    <th>Points</th>
+                </tr>
+            </table>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-7 col-xs-7">
+            <h3>Rounds</h3>
+            <table class="table table-striped table-bordered table-hover" id="games">
+                <tr>
+                    <th>#</th>
+                    <th id="white" class="icon">White</th>
+                    <th id="result" class="icon">Result</th>
+                    <th id="black" class="icon">Black</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/jquery.js"></script>
+<script src="/js/tournament.js"></script>
+</body>
+</html>

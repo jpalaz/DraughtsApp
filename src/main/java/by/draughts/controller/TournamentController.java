@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -27,9 +28,12 @@ public class TournamentController {
     private static Tournament tournament = new Tournament();
 
     static {
-        tournament.setArbiter("Arbiter's surname");
+        tournament.setName("World Championship 2017");
+        tournament.setPlace("Belarus, Minsk");
+        tournament.setArbiter("Nosevich");
         tournament.setSystem(TournamentSystem.ROUND_ROBIN);
         tournament.setBegin(new Date());
+        tournament.setEnd(addDays(tournament.getBegin(), 2));
 
         List<Player> players = new ArrayList<>();
         tournament.setPlayers(players);
@@ -44,10 +48,23 @@ public class TournamentController {
         tournament.setCurrentRound(0);
     }
 
+    private static Date addDays(Date date, int days)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.add(Calendar.DATE, days); //minus number would decrement the days
+        return cal.getTime();
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public Tournament getTournament() {
         tournamentService.generateRoundRoundGames(tournament);
         return tournament;
+    }
+
+    @RequestMapping(value = "/rounds", method = RequestMethod.GET)
+    public List<Round> getGames() {
+        return tournament.getRounds();
     }
 
     @RequestMapping(value = "/next_round", method = RequestMethod.GET)
