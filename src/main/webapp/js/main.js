@@ -61,6 +61,16 @@ $(function(){
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
         currentStep: 1,
+        hash: [
+            '8B','8D','8F','8H',
+            '7A','7C','7E','7G',
+            '6B','6D','6F','6H',
+            '5A','5C','5E','5G',
+            '4B','4D','4F','4H',
+            '3A','3C','3E','3G',
+            '2B','2D','2F','2H',
+            '1A','1C','1E','1G'
+        ],
         initialize: function () {
             this.createBoard(this.brdSize);
 
@@ -203,26 +213,9 @@ $(function(){
             }
         },
         determineListEl: function (ply) {
-            var from = this.convert10x10to8x8(ply.from);
-            var to = this.convert10x10to8x8(ply.to);
-            return from.horizontalCoordinate + from.verticalCoordinate + "-" + to.horizontalCoordinate + to.verticalCoordinate;
-        },
-        flip: function () {},
-        convert10x10to8x8: function (coordinate10x10) {
-
-            //hor array just a wow mind games 9k
-            var hor = ['A','C','E','G','B','D','F','H'];
-            var verticalCoordinate = Math.floor((coordinate10x10-1)/4) + 1;
-            //and here 9k
-            var horizontalCoordinate = hor[(coordinate10x10-1)%8];
-            return {
-                verticalCoordinate: verticalCoordinate,
-                horizontalCoordinate: horizontalCoordinate
-            };
-// 9 3A
-        },
-        convert8x8to10x10: function (coordinate8x8) {
-            // is not working now
+            var from = this.hash[ply.from - 1];
+            var to = this.hash[ply.to - 1];
+            return from + "-" + to;
         },
         createBoard: function (brdSize) {
             var firstSquareIsWhite;
@@ -280,15 +273,15 @@ $(function(){
             }
         },
         putFigure: function (coordinate10x10, className) {
-            var coordinate8x8 = this.convert10x10to8x8(coordinate10x10);
-            $('#'+coordinate8x8.verticalCoordinate+coordinate8x8.horizontalCoordinate+'-square').addClass(className);
+            var coordinate8x8 = this.hash[coordinate10x10 - 1];
+            $('#' + coordinate8x8 + '-square').addClass(className);
         },
         clearSquare: function (i) {
-            var coordinate8x8 = this.convert10x10to8x8(i);
-            $('#'+coordinate8x8.verticalCoordinate+coordinate8x8.horizontalCoordinate+'-square').removeClass('white-figure');
-            $('#'+coordinate8x8.verticalCoordinate+coordinate8x8.horizontalCoordinate+'-square').removeClass('black-figure');
-            $('#'+coordinate8x8.verticalCoordinate+coordinate8x8.horizontalCoordinate+'-square').removeClass('white-queen');
-            $('#'+coordinate8x8.verticalCoordinate+coordinate8x8.horizontalCoordinate+'-square').removeClass('black-queen');
+            var coordinate8x8 = this.hash[i - 1];
+            $('#'+coordinate8x8+'-square').removeClass('white-figure');
+            $('#'+coordinate8x8+'-square').removeClass('black-figure');
+            $('#'+coordinate8x8+'-square').removeClass('white-queen');
+            $('#'+coordinate8x8+'-square').removeClass('black-queen');
         },
         render: function (index) {
             var playerPosition = this.collection.at(index-1).attributes.position;
