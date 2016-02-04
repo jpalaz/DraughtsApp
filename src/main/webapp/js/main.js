@@ -111,7 +111,7 @@ $(function(){
                                 "number": 2,
                                 "from": 22,
                                 "to": 18,
-                                "whiteSide": false,
+                                "whiteSide": true,
                                 "beat": false
                             },
                             "position": {
@@ -173,15 +173,15 @@ $(function(){
             if(isAlternative) classPostfix = '-alternative';
 
             if(ply.whiteSide) {
-                stepNum = Math.ceil(ply.index/2) + '. ';
-                sep = " ";
-            }
+                sep = ". ";
+            } else sep = "... "
 
             if(ply.commentBefore != undefined)
                 $(appendLocation).append('<li id="' + ply.index + '-commentBefore" class="list-element-comment'+ classPostfix +'">[ '
                      + ply.commentBefore +' ]</li>');
 
-            $(appendLocation).append('<li id="' + ply.index + '-step" class="list-element-ply'+ classPostfix +'">'+ stepNum + listEl + sep +'</li>');
+            $(appendLocation).append('<li id="' + ply.index + '-step" class="list-element-ply'+ classPostfix +'">'
+                + ply.index + sep + listEl +'</li>');
 
             if(ply.commentAfter != undefined)
                 $(appendLocation).append('<li id="' + ply.index + '-commentAfter" class="list-element-comment'+ classPostfix +'">[ '
@@ -207,7 +207,9 @@ $(function(){
             var to = this.convert10x10to8x8(ply.to);
             return from.horizontalCoordinate + from.verticalCoordinate + "-" + to.horizontalCoordinate + to.verticalCoordinate;
         },
+        flip: function () {},
         convert10x10to8x8: function (coordinate10x10) {
+
             //hor array just a wow mind games 9k
             var hor = ['A','C','E','G','B','D','F','H'];
             var verticalCoordinate = Math.floor((coordinate10x10-1)/4) + 1;
