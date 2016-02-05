@@ -30,16 +30,16 @@
         </div>
 
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                <h1 class="text-right">
-                    <small>Name</small>
-                    <span id="tournament-name"></span></h1>
-                <h2 class="text-right">
-                    <small>Place</small>
-                    <span id="tournament-place"></span></h2>
-                <h3 class="text-right">
-                    <small>Arbiter</small>
-                    <span id="arbiter"></span></h3>
-                <h3 class="text-right" id="date"></h3>
+            <h1 class="text-right">
+                <small>Name</small>
+                <span id="tournament-name"></span></h1>
+            <h2 class="text-right">
+                <small>Place</small>
+                <span id="tournament-place"></span></h2>
+            <h3 class="text-right">
+                <small>Arbiter</small>
+                <span id="arbiter"></span></h3>
+            <h3 class="text-right" id="date"></h3>
         </div>
     </div>
 
@@ -57,19 +57,23 @@
         </div>
         <div class="col-lg-6 col-md-6 col-sm-7 col-xs-7">
             <h3>Rounds</h3>
-            <table class="table table-striped table-bordered table-hover" id="games">
-                <tr>
-                    <th>#</th>
-                    <th id="white" class="icon">White</th>
-                    <th id="result" class="icon">Result</th>
-                    <th id="black" class="icon">Black</th>
-                </tr>
-            </table>
+            <!--<form id="tournament-round" method="post">-->
+                <table class="table table-striped table-bordered table-hover" id="games">
+                    <tr>
+                        <th>#</th>
+                        <th id="white" class="icon">White</th>
+                        <th id="result" class="icon">Result</th>
+                        <th id="black" class="icon">Black</th>
+                    </tr>
+                </table>
+                <button type="button" class="btn btn-default" id="submit-round">Save results</button>
+            <!--</form>-->
         </div>
     </div>
 </div>
 
 <script src="/js/jquery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
 <script src="/js/tournament.js"></script>
 </body>
 </html>
