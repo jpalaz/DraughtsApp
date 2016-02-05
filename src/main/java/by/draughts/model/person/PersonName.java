@@ -1,9 +1,12 @@
-package by.draughts.model.tournament;
+package by.draughts.model.person;
 
 public class PersonName {
     private String name;
     private String surname;
     private String patronymic; // отчество
+
+    public PersonName() {
+    }
 
     public PersonName(String surname) {
         this.surname = surname;

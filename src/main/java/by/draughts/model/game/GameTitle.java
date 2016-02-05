@@ -1,6 +1,6 @@
 package by.draughts.model.game;
 
-import by.draughts.model.tournament.Player;
+import by.draughts.model.person.Player;
 
 public class GameTitle {
     private Player white;
@@ -10,10 +10,25 @@ public class GameTitle {
     public GameTitle() {
     }
 
+    @Override
+    public String toString() {
+        return "GameTitle{" +
+                "white=" + white +
+                ", black=" + black +
+                ", result=" + result +
+                '}';
+    }
+
     public GameTitle(Player white, Player black) {
         this.white = white;
         this.black = black;
         this.result = GameResult.UNDEFINED;
+    }
+
+    public GameTitle(Player white, Player black, GameResult result) {
+        this.white = white;
+        this.black = black;
+        this.result = result;
     }
 
     public Player getWhite() {

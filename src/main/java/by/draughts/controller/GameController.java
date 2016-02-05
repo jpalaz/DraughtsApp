@@ -2,7 +2,7 @@ package by.draughts.controller;
 
 import by.draughts.model.game.*;
 import by.draughts.model.ply.*;
-import by.draughts.model.tournament.Player;
+import by.draughts.model.person.Player;
 import by.draughts.service.GameService;
 import by.draughts.service.PositionService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package by.draughts.model.tournament;
+package by.draughts.model.person;
 
 public enum Rank {
     SECOND_CLASS_JUNIOR, FIRST_CLASS_JUNIOR, SECOND_CLASS, FIRST_CLASS,

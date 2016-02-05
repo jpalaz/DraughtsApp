@@ -4,6 +4,7 @@ import by.draughts.dto.tournament.PlayerDTO;
 import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.exception.NoSuchRoundException;
 import by.draughts.model.game.GameTitle;
+import by.draughts.model.person.Player;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +15,7 @@ public class Tournament {
     private String place;
     private String arbiter;
     private int roundAmount;
-    private int currentRound;
+    private int playedRounds;
     private Date begin;
     private Date end;
 
@@ -30,7 +31,7 @@ public class Tournament {
         place = tournamentDTO.getPlace();
         arbiter = tournamentDTO.getArbiter();
         roundAmount = tournamentDTO.getRoundAmount();
-        currentRound = tournamentDTO.getCurrentRound();
+        playedRounds = tournamentDTO.getCurrentRound();
         begin = tournamentDTO.getBegin();
         end = tournamentDTO.getEnd();
         system = tournamentDTO.getSystem();
@@ -41,10 +42,9 @@ public class Tournament {
         }
     }
 
-    public List<GameTitle> getRoundGames(int round) throws NoSuchRoundException {
-        round--;
-        if (rounds != null && round >= 0 && round < rounds.size())
-            return rounds.get(round).getGames();
+    public Round getRound(int roundIndex) throws NoSuchRoundException {
+        if (rounds != null && roundIndex >= 0 && roundIndex < rounds.size())
+            return rounds.get(roundIndex);
         throw new NoSuchRoundException();
     }
 
@@ -80,12 +80,12 @@ public class Tournament {
         this.roundAmount = roundAmount;
     }
 
-    public int getCurrentRound() {
-        return currentRound;
+    public int getPlayedRounds() {
+        return playedRounds;
     }
 
-    public void setCurrentRound(int currentRound) {
-        this.currentRound = currentRound;
+    public void setPlayedRounds(int playedRounds) {
+        this.playedRounds = playedRounds;
     }
 
     public TournamentSystem getSystem() {
@@ -126,5 +126,9 @@ public class Tournament {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public void setCurrentGamesResults(List<GameTitle> games) {
+        rounds.get(playedRounds).setGames(games);
     }
 }
