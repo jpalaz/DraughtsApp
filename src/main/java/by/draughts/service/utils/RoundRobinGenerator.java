@@ -1,7 +1,7 @@
 package by.draughts.service.utils;
 
 import by.draughts.model.game.GameTitle;
-import by.draughts.model.tournament.Player;
+import by.draughts.model.person.Player;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 
@@ -20,20 +20,20 @@ public class RoundRobinGenerator {
     public static List<GameTitle> generateRounds(Tournament tournament) {
         setParameters(tournament);
         generate(tournament);
-        return rounds.get(tournament.getCurrentRound()).getGames();
+        return rounds.get(tournament.getPlayedRounds()).getGames();
     }
 
     private static void setParameters(Tournament tournament) {
         rounds = new ArrayList<>(tournament.getRoundAmount());
         players = tournament.getPlayers();
-        gamesAmount = players.size() / 2;
         isWhiteSideForLast = false;
         if (players.size() % 2 != 0) {
-            gamesAmount++;
             last = new Player("Free");
+            players.add(last);
         } else {
             last = players.get(players.size() - 1);
         }
+        gamesAmount = players.size() / 2;
     }
 
     private static void generate(Tournament tournament) {

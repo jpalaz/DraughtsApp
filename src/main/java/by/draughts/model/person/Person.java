@@ -1,4 +1,4 @@
-package by.draughts.model.tournament;
+package by.draughts.model.person;
 
 import java.util.Date;
 

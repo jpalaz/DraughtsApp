@@ -12,6 +12,11 @@ public class Round {
     public Round() {
     }
 
+    public Round(Date date, List<GameTitle> games) {
+        this.date = date;
+        this.games = games;
+    }
+
     public Date getDate() {
         return date;
     }

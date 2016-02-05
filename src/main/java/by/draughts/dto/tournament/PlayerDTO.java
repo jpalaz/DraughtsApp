@@ -1,7 +1,7 @@
 package by.draughts.dto.tournament;
 
-import by.draughts.model.tournament.PersonName;
-import by.draughts.model.tournament.Player;
+import by.draughts.model.person.PersonName;
+import by.draughts.model.person.Player;
 
 public class PlayerDTO {
     private PersonName name;
