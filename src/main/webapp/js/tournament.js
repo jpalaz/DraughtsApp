@@ -24,7 +24,6 @@ var appState = {
     tableGamesHeader = TABLE_GAMES.firstElementChild.outerHTML;
     tablePlayersHeader = TABLE_PLAYERS.firstElementChild.outerHTML;
     getTournament();
-    getNextRound()
 })();
 
 function getTournament() {

@@ -4,6 +4,7 @@ import by.draughts.dto.tournament.GameTitleDTO;
 import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
+import by.draughts.model.tournament.Result;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 import by.draughts.model.tournament.TournamentSystem;
@@ -109,10 +110,12 @@ public class TournamentController {
 
     @RequestMapping(method = RequestMethod.POST)
     public void createTournament(@RequestBody TournamentDTO tournamentDTO) {
-        if (tournamentDTO.getSystem() == TournamentSystem.SWISS)
+        if (tournamentDTO.getSystem() == TournamentSystem.SWISS) {
             tournamentSwiss = new Tournament(tournamentDTO);
-        else
+        }
+        else {
             tournamentRR = new Tournament(tournamentDTO);
+        }
     }
 
     @RequestMapping(value = "/current_round", method = RequestMethod.POST)

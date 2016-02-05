@@ -11,15 +11,6 @@ public class GameTitle implements Comparable<GameTitle> {
     public GameTitle() {
     }
 
-    @Override
-    public String toString() {
-        return "GameTitle{" +
-                "white=" + white +
-                ", black=" + black +
-                ", result=" + result +
-                '}';
-    }
-
     public GameTitle(Player white, Player black) {
         this.white = white;
         this.black = black;
