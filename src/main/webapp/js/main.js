@@ -58,6 +58,12 @@ $(function(){
         return parsedMoves;
     }
 
+    App.Models.Game = Backbone.Model.extend({
+        url: 'http://localhost:8080/games'
+    });
+
+
+
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
         currentStep: 1,
@@ -74,8 +80,29 @@ $(function(){
         initialize: function () {
             this.createBoard(this.brdSize);
 
-            // THEN IT WILL BE FETCH METHOD
-            var game = {
+            var context = this;
+
+            var game = new App.Models.Game;
+            game.fetch({
+                success: function (form) {
+                   var g = form.attributes;
+                  //console.log(g);
+
+                    console.log(context);
+                    var plies = parsePlies(g);
+                    for(var i = 0; i < plies.length; i++) {
+                        context.collection.add(plies[i]);
+                    }
+                    context.fillGameStepsSidebar();
+                    context.render(1);
+                }
+            });
+
+
+            //console.log(game.attributes);
+
+            // INSTEAD OF FETCH METHOD
+/*            var game = {
                 "id": "1",
                 "metadata": {
                     "event": "Belarus Highest League 2015",
@@ -163,11 +190,12 @@ $(function(){
             };
 
             var plies = parsePlies(game);
-            for(let i = 0; i < plies.length; i++) {
+            for(var i = 0; i < plies.length; i++) {
                 this.collection.add(plies[i]);
             }
             this.fillGameStepsSidebar();
             this.render(1);
+*/
         },
         fillGameStepsSidebar: function () {
             var sep = ',';
@@ -184,7 +212,7 @@ $(function(){
 
             if(ply.whiteSide) {
                 sep = ". ";
-            } else sep = "... "
+            } else sep = ". ... "
 
             if(ply.commentBefore != undefined)
                 $(appendLocation).append('<li id="' + ply.index + '-commentBefore" class="list-element-comment'+ classPostfix +'">[ '
@@ -341,7 +369,7 @@ $(function(){
     var game_positions = new App.Collections.Board();
 
     //window.draughts_board_demonstration = new App.Views.Game10x10({collection: game_positions, el: '#draughts-board-demonstration'});
-    window.draughts_board_demonstration = new App.Views.Game8x8({collection: game_positions, el: '#draughts-board-demonstration'});
+    window.draughts_board_demonstration = new App.Views.Game({collection: game_positions, el: '#draughts-board-demonstration'});
 
 
 });
