@@ -153,9 +153,20 @@ function getResultEnumValue(result) {
 $("#submit-round").click(function () {
     var games = appState.currentGames.games;
     var results = document.getElementsByClassName("round-result");
+    //var areDefinedResults = true;
     for (var i = 0; i < games.length; ++i) {
         var e = results[i];
         games[i].result = getResultEnumValue(e.options[e.selectedIndex].text);
+
+        if (games[i].result == 'UNDEFINED') {
+            if (games[i].white.name.surname == 'Free') {
+                games[i].result == 'BLACK_WON';
+            } else if (games[i].black.name.surname == 'Free') {
+                games[i].result == 'WHITE_WON';
+            } else {
+                return false;
+            }
+        }
     }
     var url = 'tournaments/current_round';
     if (appState.system == 'SWISS') {

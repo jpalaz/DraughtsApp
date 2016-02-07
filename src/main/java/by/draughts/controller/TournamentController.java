@@ -1,6 +1,5 @@
 package by.draughts.controller;
 
-import by.draughts.dto.game.GameTitleDTO;
 import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
@@ -105,7 +104,6 @@ public class TournamentController {
 
     @RequestMapping(value = "/current_round", method = RequestMethod.POST)
     public void setRoundResultsSwiss(@RequestBody List<GameTitle> games) {
-        System.out.println(games);
         tournamentService.setRoundResults(tournamentSwiss, games);
     }
 
