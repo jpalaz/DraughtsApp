@@ -6,7 +6,7 @@ import by.draughts.model.ply.Sequence;
 @Table(name = "games")*/
 public class Game {
     /*@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)*/
+    @GeneratedValue(strategy = GenerationType.AUTO) */
     private String id;
 
     private GameMetadata metadata;

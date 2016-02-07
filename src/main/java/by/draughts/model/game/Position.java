@@ -7,6 +7,15 @@ public class Position {
     private List<Byte> whiteKings;
     private List<Byte> blacks;
     private List<Byte> blackKings;
+    private boolean isWhiteMove;
+
+    public boolean isWhiteMove() {
+        return isWhiteMove;
+    }
+
+    public void setIsWhiteMove(boolean isWhiteMove) {
+        this.isWhiteMove = isWhiteMove;
+    }
 
     public Position() {
     }
