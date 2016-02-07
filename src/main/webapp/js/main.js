@@ -6,7 +6,7 @@ $(function(){
     };
 
 
-    App.Models.PlyDTO  = Backbone.Model.extend({
+    App.Models.Ply  = Backbone.Model.extend({
         default: {
             index: 1,
             commentBefore: undefined,
@@ -22,14 +22,11 @@ $(function(){
                 blackKings: []
             },
             alternatives: [],
-            parse: function(response) {
-
-            }
         }
     });
 
     App.Collections.Board = Backbone.Collection.extend({
-        model: App.Models.PlyDTO
+        model: App.Models.Ply
     });
 
     //THEN IT MUST BECOME PARSE METHOD
@@ -43,7 +40,7 @@ $(function(){
             if(!ply["position"].whiteKings) ply["position"].whiteKings = [];
             if(!ply["position"].blacks) ply["position"].blacks = [];
             if(!ply["position"].blackKings) ply["position"].blackKings = [];
-            parsedMoves.push(new App.Models.PlyDTO({
+            parsedMoves.push(new App.Models.Ply({
                 index: ply["metadata"]["number"],
                 commentBefore: ply["comment"]["commentBefore"],
                 commentAfter: ply["comment"]["commentAfter"],
@@ -58,23 +55,56 @@ $(function(){
         return parsedMoves;
     }
 
+    App.Models.Game = Backbone.Model.extend({
+        url: 'http://localhost:8080/games'
+    });
+
+
+
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
-        currentStep: 1,
+        currentStep: 0,
         hash: [
-            '8B','8D','8F','8H',
-            '7A','7C','7E','7G',
-            '6B','6D','6F','6H',
-            '5A','5C','5E','5G',
-            '4B','4D','4F','4H',
-            '3A','3C','3E','3G',
-            '2B','2D','2F','2H',
-            '1A','1C','1E','1G'
+            'b8','d8','f8','h8',
+            'a7','c7','e7','g7',
+            'b6','d6','f6','h6',
+            'a5','c5','e5','g5',
+            'b4','d4','f4','h4',
+            'a3','c3','e3','g3',
+            'b2','d2','f2','h2',
+            'a1','c1','e1','g1'
         ],
+        begin: undefined,
         initialize: function () {
             this.createBoard(this.brdSize);
 
-            // THEN IT WILL BE FETCH METHOD
+            var context = this;
+
+            var game = new App.Models.Game;
+            game.fetch({
+                success: function (form) {
+                   var g = form.attributes;
+
+                    context.begin = g.begin;
+                    if(!context.begin.whiteKings) context.begin.whiteKings = [];
+                    if(!context.begin.blackKings) context.begin.blackKings = [];
+                    if(!context.begin.whites) context.begin.whites = [];
+                    if(!context.begin.blacks) context.begin.blacks = [];
+                    console.log(context.begin);
+                    var plies = parsePlies(g);
+                    for(var i = 0; i < plies.length; i++) {
+                        context.collection.add(plies[i]);
+                    }
+                    context.fillGameStepsSidebar();
+                    context.render(0);
+                }
+            });
+
+
+            //console.log(game.attributes);
+
+            // INSTEAD OF FETCH METHOD
+            /*
             var game = {
                 "id": "1",
                 "metadata": {
@@ -163,11 +193,12 @@ $(function(){
             };
 
             var plies = parsePlies(game);
-            for(let i = 0; i < plies.length; i++) {
+            for(var i = 0; i < plies.length; i++) {
                 this.collection.add(plies[i]);
             }
             this.fillGameStepsSidebar();
             this.render(1);
+            */
         },
         fillGameStepsSidebar: function () {
             var sep = ',';
@@ -184,18 +215,18 @@ $(function(){
 
             if(ply.whiteSide) {
                 sep = ". ";
-            } else sep = "... "
+            } else sep = ". ... "
 
             if(ply.commentBefore != undefined)
-                $(appendLocation).append('<li id="' + ply.index + '-commentBefore" class="list-element-comment'+ classPostfix +'">[ '
-                     + ply.commentBefore +' ]</li>');
+                $(appendLocation).append('<li id="' + ply.index + '-commentBefore" class="list-element-comment'+ classPostfix +'"> '
+                     + ply.commentBefore +' </li>');
 
             $(appendLocation).append('<li id="' + ply.index + '-step" class="list-element-ply'+ classPostfix +'">'
                 + ply.index + sep + listEl +'</li>');
 
             if(ply.commentAfter != undefined)
-                $(appendLocation).append('<li id="' + ply.index + '-commentAfter" class="list-element-comment'+ classPostfix +'">[ '
-                     + ply.commentAfter +' ]</li>');
+                $(appendLocation).append('<li id="' + ply.index + '-commentAfter" class="list-element-comment'+ classPostfix +'"> '
+                     + ply.commentAfter +' </li>');
 
             if(ply.alternatives != undefined) {
                 $(appendLocation).append('<li id="' + ply.index + '-alternatives" class="list-element-alternative'+ classPostfix +'"></li>');
@@ -227,7 +258,8 @@ $(function(){
                     var squareCoordinate =  this.determineSquareCoordinate(i,j);
                     var squareClassName = this.getSquareClassName();
                     if(squareColor === 'black')
-                        $('#'+ i +'-row').append('<div id="'+ squareCoordinate +'-square" class="' + squareClassName + ' '+squareColor+'-square"></div>');
+                        $('#'+ i +'-row').append('<div id="'+ squareCoordinate
+                            +'-square" class="' + squareClassName + ' '+squareColor+'-square"></div>');
                     else
                         $('#'+ i +'-row').append('<div class="' + squareClassName + ' '+squareColor+'-square"></div>');
                 }
@@ -247,7 +279,9 @@ $(function(){
 
     },
         determineSquareCoordinate: function (i,j) {
-            return i.toString() + String.fromCharCode(64+j);
+            return this.hash[
+                (this.brdSize + 1 - i - 1)*4 + Math.ceil(j/2) - 1
+                ];
         },
         getSquareClassName: function () {
             return 'board8x8-square';
@@ -267,7 +301,7 @@ $(function(){
             }
         },
         prevStep: function () {
-            if(this.currentStep > 1) {
+            if(this.currentStep > 0) {
                 --this.currentStep
                 this.render(this.currentStep);
             }
@@ -278,13 +312,19 @@ $(function(){
         },
         clearSquare: function (i) {
             var coordinate8x8 = this.hash[i - 1];
-            $('#'+coordinate8x8+'-square').removeClass('white-figure');
-            $('#'+coordinate8x8+'-square').removeClass('black-figure');
-            $('#'+coordinate8x8+'-square').removeClass('white-queen');
-            $('#'+coordinate8x8+'-square').removeClass('black-queen');
+            var $coordSquare =  $('#'+coordinate8x8+'-square');
+            $coordSquare.removeClass('white-figure');
+            $coordSquare.removeClass('black-figure');
+            $coordSquare.removeClass('white-queen');
+            $coordSquare.removeClass('black-queen');
         },
         render: function (index) {
-            var playerPosition = this.collection.at(index-1).attributes.position;
+            var playerPosition;
+            if(index != 0) {
+                playerPosition = this.collection.at(index-1).attributes.position;
+            } else {
+                playerPosition = this.begin;
+            }
             var whites = playerPosition.whites;
             var blacks = playerPosition.blacks;
             var whiteKings = playerPosition.whiteKings;
@@ -341,7 +381,7 @@ $(function(){
     var game_positions = new App.Collections.Board();
 
     //window.draughts_board_demonstration = new App.Views.Game10x10({collection: game_positions, el: '#draughts-board-demonstration'});
-    window.draughts_board_demonstration = new App.Views.Game8x8({collection: game_positions, el: '#draughts-board-demonstration'});
+    window.draughts_board_demonstration = new App.Views.Game({collection: game_positions, el: '#draughts-board-demonstration'});
 
 
 });

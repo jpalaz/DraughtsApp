@@ -37,11 +37,23 @@ public class GameController {
         Ply ply = new Ply(new PlyMetadata());
         game.setMainMoves(new Sequence());
         game.getMainMoves().add(ply);
+        setFirstPly(ply);
 
+        ply = new Ply(new PlyMetadata());
+        setSecondPly(ply);
+        game.getMainMoves().add(ply);
+
+        ply = new Ply(new PlyMetadata());
+        setThirdPly(ply);
+        game.getMainMoves().add(ply);
+    }
+
+    private static void setFirstPly(Ply ply) {
         ply.getMetadata().setFrom((byte)22);
         ply.getMetadata().setTo((byte)18);
         ply.setPosition(new Position());
         ply.getMetadata().setNumber((byte)1);
+        ply.getMetadata().setWhiteSide(true);
 
         ply.setComment(new Comment());
         ply.getComment().setCommentBefore("Comment before first ply");
@@ -55,7 +67,7 @@ public class GameController {
         game.getBegin().setWhites(draughts);
 
         draughts = new ArrayList<>(draughts);
-        draughts.set((byte)1, (byte)18);
+        draughts.set(1, (byte)18);
         ply.getPosition().setWhites(draughts);
 
         draughts = new ArrayList<>();
@@ -65,6 +77,62 @@ public class GameController {
         game.getBegin().setBlacks(draughts);
 
         ply.getPosition().setBlacks(new ArrayList<>(draughts));
+    }
+
+    private static void setSecondPly(Ply ply) {
+        ply.getMetadata().setFrom((byte)11);
+        ply.getMetadata().setTo((byte)16);
+        ply.setPosition(new Position());
+        ply.getMetadata().setNumber((byte)1);
+        ply.getMetadata().setWhiteSide(false);
+
+        ply.setComment(new Comment());
+        ply.getComment().setCommentBefore("before second ply");
+        ply.getComment().setCommentAfter("after second ply");
+        ply.getComment().setRate(PlyRate.DISPUTABLE);
+
+        ArrayList<Byte> draughts = new ArrayList<>();
+        for (byte i = 21; i <= 32; ++i) {
+            draughts.add(i);
+        }
+        draughts.set(1, (byte)18);
+        ply.getPosition().setWhites(draughts);
+
+        draughts = new ArrayList<>();
+        for (byte i = 1; i <= 12; ++i) {
+            draughts.add(i);
+        }
+        draughts.set(10, (byte)16);
+        ply.getPosition().setBlacks(new ArrayList<>(draughts));
+    }
+
+    private static void setThirdPly(Ply ply) {
+        ply.getMetadata().setFrom((byte)24);
+        ply.getMetadata().setTo((byte)19);
+        ply.setPosition(new Position());
+        ply.getMetadata().setNumber((byte)2);
+        ply.getMetadata().setWhiteSide(true);
+
+        ply.setComment(new Comment());
+        ply.getComment().setCommentBefore("before third ply");
+        ply.getComment().setCommentAfter("after third ply");
+        ply.getComment().setRate(PlyRate.GOOD);
+
+        ArrayList<Byte> draughts = new ArrayList<>();
+        for (byte i = 21; i <= 32; ++i) {
+            draughts.add(i);
+        }
+        draughts.set(1, (byte)18);
+        draughts.set(3, (byte)19);
+        ply.getPosition().setWhites(draughts);
+
+        draughts = new ArrayList<>();
+        for (byte i = 1; i <= 12; ++i) {
+            draughts.add(i);
+        }
+        draughts.set(10, (byte)16);
+        ply.getPosition().setBlacks(new ArrayList<>(draughts));
+
     }
 
     @RequestMapping(method = RequestMethod.GET)
