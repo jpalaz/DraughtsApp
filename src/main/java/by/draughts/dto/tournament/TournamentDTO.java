@@ -1,6 +1,6 @@
 package by.draughts.dto.tournament;
 
-import by.draughts.model.tournament.Player;
+import by.draughts.model.person.Player;
 import by.draughts.model.tournament.Tournament;
 import by.draughts.model.tournament.TournamentSystem;
 
@@ -43,7 +43,7 @@ public class TournamentDTO {
         place = tournament.getPlace();
         arbiter = tournament.getArbiter();//new PersonDTO(tournament.getArbiter());
         roundAmount = tournament.getRoundAmount();
-        currentRound = tournament.getCurrentRound();
+        currentRound = tournament.getPlayedRounds();
         begin = tournament.getBegin();
         end = tournament.getEnd();
         system = tournament.getSystem();

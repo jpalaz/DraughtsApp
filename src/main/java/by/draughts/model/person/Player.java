@@ -1,15 +1,20 @@
-package by.draughts.model.tournament;
+package by.draughts.model.person;
 
 import by.draughts.dto.tournament.PlayerDTO;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Player {
     private PersonName name;
     private short points;
     private byte gamesPlayed;
+    private int sortingNumber;
+    private int place;
     private List<Player> rivals;
+
+    private final static SortingComparator sortingComparator = new SortingComparator();
 
     public Player() {
     }
@@ -23,6 +28,33 @@ public class Player {
         points = playerDTO.getPoints();
         gamesPlayed = playerDTO.getGamesPlayed();
         rivals = new ArrayList<>();
+    }
+
+    private static class SortingComparator implements Comparator<Player> {
+        @Override
+        public int compare(Player o1, Player o2) {
+            return o1.getSortingNumber() - o2.getSortingNumber();
+        }
+    }
+
+    public static SortingComparator getSortingComparator() {
+        return sortingComparator;
+    }
+
+    public int getSortingNumber() {
+        return sortingNumber;
+    }
+
+    public void setSortingNumber(int sortingNumber) {
+        this.sortingNumber = sortingNumber;
+    }
+
+    public int getPlace() {
+        return place;
+    }
+
+    public void setPlace(int place) {
+        this.place = place;
     }
 
     public PersonName getName() {

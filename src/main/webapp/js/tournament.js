@@ -13,28 +13,35 @@ var TOURNAMENT_DATE = document.getElementById('date');
 var tableGamesHeader;
 var tablePlayersHeader;
 
+var appState = {
+    system: 'SWISS',
+    currentRound: 0,
+    currentGames: {}
+};
+
 (function run() {
     tableGamesHeader = TABLE_GAMES.firstElementChild.outerHTML;
     tablePlayersHeader = TABLE_PLAYERS.firstElementChild.outerHTML;
     getTournament();
+    getNextRound()
 })();
 
 function getTournament() {
     $.ajax({
-        url : 'tournaments',
-        success : function(data) {
+        //url : 'tournaments',
+        type: "GET",
+        url: 'tournaments/swiss',
+        success: function (data) {
             updateStates(data);
             createAllPlayers(data.players);
-            createAllRounds(data.rounds);
         },
-        dataType : "json"
+        dataType: "json"
     });
 }
 
 function updateStates(data) {
-    TOURNAMENT_SYSTEM.innerHTML = data.system;
+    TOURNAMENT_SYSTEM.innerHTML = appState.system = data.system;
     PLAYERS_NUMBER.innerHTML = data.players.length;
-    CURRENT_ROUND.innerHTML = data.currentRound;
     TOURNAMENT_NAME.innerHTML = data.name;
     TOURNAMENT_PLACE.innerHTML = data.place;
     TOURNAMENT_ARBITER.innerHTML = data.arbiter;
@@ -44,6 +51,17 @@ function updateStates(data) {
 
 function getDateString(date) {
     return date.getDay() + '.' + date.getMonth() + '.' + date.getFullYear();
+}
+
+function getPlayers() {
+    $.ajax({
+        type: "GET",
+        url: 'tournaments/players',
+        success: function (data) {
+            createAllPlayers(data.players);
+        },
+        dataType: "json"
+    });
 }
 
 function createAllPlayers(players) {
@@ -61,32 +79,48 @@ function addPlayerToHTML(player, index) {
         + '</td><td>' + player.gamesPlayed + '</td><td>' + player.points + '</td>';
 }
 
-function createAllRounds(rounds) {
+function getNextRound() {
+    $.ajax({
+        type: "GET",
+        url: 'tournaments/swiss/next_round/' + appState.currentRound,
+        success: function (data) {
+            CURRENT_ROUND.innerHTML = ++appState.currentRound;
+            appState.currentGames = data;
+            createRound(data);
+        },
+        dataType: "json"
+    });
+}
+
+function createRound(round) {
     TABLE_GAMES.innerHTML = "";
     var header = TABLE_GAMES.insertRow(-1);
     header.outerHTML = tableGamesHeader;
-    for (var i = 0; i < rounds.length; i++) {
-        var dateString = getDateString(new Date(rounds[i].date));
-        addRoundItem(dateString, i + 1);
-        var games = rounds[i].games;
-        for (var j = 0; j < games.length; j++) {
-            addGameToHTML(games[j], j + 1);
-        }
+    var dateString = getDateString(new Date(round.date));
+    addRoundItem(dateString, appState.currentRound);
+    var games = round.games;
+    for (var j = 0; j < games.length; j++) {
+        addGameToHTML(games[j], j + 1);
     }
+
 }
 
 function addRoundItem(dateString, index) {
     var row = TABLE_GAMES.insertRow(-1);
     row.innerHTML = '<td colspan="4" class="text-center warning">Round ' + index
-        + ' ' + dateString + ' </td>';
+        + ', ' + dateString + ' </td>';
 }
 
 function addGameToHTML(game, index) {
     var row = TABLE_GAMES.insertRow(-1);
     row.innerHTML = '<td>' + index + '</td><td>' + game.white.name.surname
-        + '</td><td>' + getResultString(game.result) + '</td><td>'
+        + '</td><td><div class="col-sm-6"><select class="form-control round-result">'
+        + '<option value="UNDEFINED">*</option>'
+        + '<option value="WHITE_WON">2-0</option>'
+        + '<option value="DRAW">1-1</option>'
+        + '<option value="BLACK_WON">0-2</option></select></div></td><td>'
         + game.black.name.surname + '</td>';
-}
+} //getResultString(game.result)
 
 function getResultString(result) {
     switch (result) {
@@ -101,3 +135,55 @@ function getResultString(result) {
             return '*';
     }
 }
+
+function getResultEnumValue(result) {
+    switch (result) {
+        case '2-0':
+            return 'WHITE_WON';
+        case '1-1':
+            return 'DRAW';
+        case '0-2':
+            return 'BLACK_WON';
+        case '*':
+        default:
+            return 'UNDEFINED';
+    }
+}
+
+$("#submit-round").click(function () {
+    var games = appState.currentGames.games;
+    var results = document.getElementsByClassName("round-result");
+    //var areDefinedResults = true;
+    for (var i = 0; i < games.length; ++i) {
+        var e = results[i];
+        games[i].result = getResultEnumValue(e.options[e.selectedIndex].text);
+
+        if (games[i].result == 'UNDEFINED') {
+            if (games[i].white.name.surname == 'Free') {
+                games[i].result == 'BLACK_WON';
+            } else if (games[i].black.name.surname == 'Free') {
+                games[i].result == 'WHITE_WON';
+            } else {
+                return false;
+            }
+        }
+    }
+    var url = 'tournaments/current_round';
+    if (appState.system == 'SWISS') {
+        url += '/swiss'
+    } else {
+        url += '/robin'
+    }
+
+    $.ajax({
+        type: "POST",
+        url: 'tournaments/current_round',
+        data: JSON.stringify(games),
+        success: function () {
+            getNextRound();
+            getPlayers();
+        },
+        error: function() { alert("Fail!") },
+        contentType: "application/json"
+    });
+});

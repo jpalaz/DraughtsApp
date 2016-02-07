@@ -1,13 +1,12 @@
 package by.draughts.service.impl;
 
 import by.draughts.model.exception.NoSuchRoundException;
-import by.draughts.model.game.Game;
 import by.draughts.model.game.GameTitle;
-import by.draughts.model.tournament.Player;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 import by.draughts.service.TournamentService;
 import by.draughts.service.utils.RoundRobinGenerator;
+import by.draughts.service.utils.SwissGenerator;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,16 +25,18 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<GameTitle> getNextRoundGames(Tournament tournament) {
+    public Round getNextRound(Tournament tournament) {
         try {
-            return tournament.getRoundGames(tournament.getCurrentRound());
+            return tournament.getRound(tournament.getPlayedRounds());
         } catch (NoSuchRoundException e) {
             return generateNextRound(tournament);
         }
     }
 
-    private List<GameTitle> generateNextRound(Tournament tournament) {
+    private Round generateNextRound(Tournament tournament) {
         List<GameTitle> games = new ArrayList<>();
+        Round round = new Round(new Date(), games);
+        tournament.getRounds().add(round);
         switch (tournament.getSystem()) {
             case SWISS:
                 generateNextRoundGamesSwiss(tournament);
@@ -44,7 +45,7 @@ public class TournamentServiceImpl implements TournamentService {
                 generateNextRoundGamesRound(tournament);
                 break;
         }
-        return games;
+        return round;
     }
 
     public List<GameTitle> generateNextRoundGamesRound(Tournament tournament) {
@@ -53,6 +54,14 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<GameTitle> generateNextRoundGamesSwiss(Tournament tournament) {
-        return null;
+        return SwissGenerator.generateNextRound(tournament);
+    }
+
+    @Override
+    public void setRoundResults(Tournament tournament, List<GameTitle> games) {
+        tournament.setCurrentGamesResults(games);
+        for (GameTitle game : games) {
+            
+        }
     }
 }
