@@ -1,20 +1,17 @@
 package by.draughts.model.ply;
 
-import by.draughts.model.game.Position;
-
 import java.util.List;
 
 public class Ply {
     private short number;
-    private PlyMetadata metadata;
-    private Position position;
+    private PlyPosition metadata;
     private Comment comment;
     private List<Sequence> alternatives;
 
     public Ply() {
     }
 
-    public Ply(PlyMetadata metadata) {
+    public Ply(PlyPosition metadata) {
         this.metadata = metadata;
     }
 
@@ -26,20 +23,12 @@ public class Ply {
         this.number = number;
     }
 
-    public PlyMetadata getMetadata() {
+    public PlyPosition getPlyPosition() {
         return metadata;
     }
 
-    public void setMetadata(PlyMetadata metadata) {
+    public void setPlyPosition(PlyPosition metadata) {
         this.metadata = metadata;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setPosition(Position position) {
-        this.position = position;
     }
 
     public Comment getComment() {

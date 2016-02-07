@@ -1,10 +1,11 @@
 package by.draughts.service;
 
-import by.draughts.model.PlyMetadata;
-import by.draughts.model.Position;
+
+import by.draughts.model.game.Position;
+import by.draughts.model.ply.PlyPosition;
 
 import java.util.List;
 
-public interface PositionService{
-    List<PlyMetadata> getPosibleMoves(Position obj);
+public interface PositionService {
+    List<PlyPosition> getPosibleMoves(Position obj);
 }

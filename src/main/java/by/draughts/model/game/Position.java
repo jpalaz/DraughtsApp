@@ -9,11 +9,11 @@ public class Position {
     private List<Byte> blackKings;
     private boolean isWhiteMove;
 
-    public boolean isWhiteMove(){
+    public boolean isWhiteMove() {
         return isWhiteMove;
     }
 
-    public void setIsWhiteMove(boolean isWhiteMove){
+    public void setIsWhiteMove(boolean isWhiteMove) {
         this.isWhiteMove = isWhiteMove;
     }
 
