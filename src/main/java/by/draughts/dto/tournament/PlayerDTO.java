@@ -1,42 +1,32 @@
 package by.draughts.dto.tournament;
 
-import by.draughts.model.person.PersonName;
+import by.draughts.model.person.Person;
 import by.draughts.model.person.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerDTO {
-    private PersonName name;
-    private short points;
+    private Person person;
     private byte gamesPlayed;
 
     public PlayerDTO(Player player) {
-        name = player.getName();
-        points = player.getPoints();
         gamesPlayed = player.getGamesPlayed();
     }
 
     public PlayerDTO(String name) {
-        this.name = new PersonName(name);
-        points = 0;
-        gamesPlayed = 0;
+        this.person = new Person(name);
     }
 
     public PlayerDTO() {
     }
 
-    public PersonName getName() {
-        return name;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setName(PersonName name) {
-        this.name = name;
-    }
-
-    public short getPoints() {
-        return points;
-    }
-
-    public void setPoints(short points) {
-        this.points = points;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public byte getGamesPlayed() {

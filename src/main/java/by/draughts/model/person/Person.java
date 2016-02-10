@@ -1,39 +1,41 @@
 package by.draughts.model.person;
 
-import java.util.Date;
-
 public class Person {
-    private String country;
-    private String place;
-    private Date birthday;
+    private String name;
+    private String surname;
+    private String patronymic; // отчество
     private Rank rank;
     private int rating;
 
     public Person() {
     }
 
-    public String getCountry() {
-        return country;
+    public Person(String surname) {
+        this.surname = surname;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public String getName() {
+        return name;
     }
 
-    public String getPlace() {
-        return place;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setPlace(String place) {
-        this.place = place;
+    public String getSurname() {
+        return surname;
     }
 
-    public Date getBirthday() {
-        return birthday;
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
+    public String getPatronymic() {
+        return patronymic;
+    }
+
+    public void setPatronymic(String patronymic) {
+        this.patronymic = patronymic;
     }
 
     public Rank getRank() {
