@@ -1,5 +1,6 @@
 package by.draughts.service;
 
+import by.draughts.dto.tournament.GameTitleDTO;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
@@ -16,5 +17,5 @@ public interface TournamentService {
 
     List<GameTitle> generateNextRoundGamesSwiss(Tournament tournament);
 
-    void setRoundResults(Tournament tournament, List<GameTitle> games);
+    void setRoundResults(Tournament tournament, List<GameTitleDTO> games);
 }

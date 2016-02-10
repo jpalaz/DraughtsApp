@@ -2,6 +2,7 @@ package by.draughts.service.utils;
 
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
+import by.draughts.model.tournament.Result;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 
@@ -34,6 +35,9 @@ public class RoundRobinGenerator {
             last = players.get(players.size() - 1);
         }
         gamesAmount = players.size() / 2;
+        for (Player player : players) {
+            player.setResults(players.size() - 1);
+        }
     }
 
     private static void generate(Tournament tournament) {
@@ -41,10 +45,7 @@ public class RoundRobinGenerator {
         increase = 0;
         decrease = lastIndex - 1;
         for (int i = 0; i < tournament.getRoundAmount(); ++i) {
-            Round round = new Round();
-            round.setDate(tournament.getBegin());
-            List<GameTitle> roundGames = getGames(lastIndex);
-            round.setGames(roundGames);
+            Round round = new Round(tournament.getBegin(), getGames(lastIndex), i + 1);
             rounds.add(round);
         }
         tournament.setRounds(rounds);

@@ -1,8 +1,10 @@
 package by.draughts.controller;
 
+import by.draughts.dto.tournament.GameTitleDTO;
 import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
+import by.draughts.model.tournament.Result;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 import by.draughts.model.tournament.TournamentSystem;
@@ -65,8 +67,8 @@ public class TournamentController {
         return cal.getTime();
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public Tournament getTournament() {
+    @RequestMapping(value = "/robin", method = RequestMethod.GET)
+    public Tournament getTournamentRobin() {
         tournamentService.generateRoundRoundGames(tournamentRR);
         return tournamentRR;
     }
@@ -82,33 +84,47 @@ public class TournamentController {
         return tournamentRR.getRounds();
     }
 
-    @RequestMapping(value = "/swiss/next_round/{currentRound}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public Round getTournamentSwissNextRound(@PathVariable Integer currentRound) {
-        tournamentSwiss.setPlayedRounds(currentRound);
-        return tournamentService.getNextRound(tournamentSwiss);
+    @RequestMapping(value = "/robin/next_round", method = RequestMethod.GET)
+    public Round getTournamentRobinNextRound() {
+        if (tournamentRR.getPlayedRounds() == tournamentRR.getRoundAmount()) {
+            tournamentRR.setPlayedRounds(0);
+        }
+        Round round = tournamentService.getNextRound(tournamentRR);
+        return round;
     }
 
-    @RequestMapping(value = "/players", method = RequestMethod.GET)
-    public List<Player> getTournamentPlayers() {
+    @RequestMapping(value = "/swiss/next_round", method = RequestMethod.GET)
+    public Round getTournamentSwissNextRound() {
+        return tournamentService.getNextRound(tournamentSwiss);
+     }
+
+    @RequestMapping(value = "/robin/players", method = RequestMethod.GET)
+    public List<Player> getTournamentRobinPlayers() {
+        return tournamentRR.getPlayers();
+    }
+
+    @RequestMapping(value = "/swiss/players", method = RequestMethod.GET)
+    public List<Player> getTournamentSwissPlayers() {
         return tournamentSwiss.getPlayers();
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public void createTournament(@RequestBody TournamentDTO tournamentDTO) {
-        if (tournamentDTO.getSystem() == TournamentSystem.SWISS)
+        if (tournamentDTO.getSystem() == TournamentSystem.SWISS) {
             tournamentSwiss = new Tournament(tournamentDTO);
-        else
+        }
+        else {
             tournamentRR = new Tournament(tournamentDTO);
+        }
     }
 
-    @RequestMapping(value = "/current_round", method = RequestMethod.POST)
-    public void setRoundResultsSwiss(@RequestBody List<GameTitle> games) {
+    @RequestMapping(value = "/swiss/current_round", method = RequestMethod.POST)
+    public void setRoundResultsSwiss(@RequestBody List<GameTitleDTO> games) {
         tournamentService.setRoundResults(tournamentSwiss, games);
     }
 
-    @RequestMapping(value = "/current_round/robin", method = RequestMethod.POST)
-    public void setRoundResultsRound(@RequestBody List<GameTitle> games) {
+    @RequestMapping(value = "/robin/current_round", method = RequestMethod.POST)
+    public void setRoundResultsRobin(@RequestBody List<GameTitleDTO> games) {
         tournamentService.setRoundResults(tournamentRR, games);
     }
 }
