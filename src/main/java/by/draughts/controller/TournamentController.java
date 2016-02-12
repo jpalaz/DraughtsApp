@@ -1,6 +1,6 @@
 package by.draughts.controller;
 
-import by.draughts.dto.game.GameTitleDTO;
+import by.draughts.dto.tournament.GameTitleDTO;
 import by.draughts.dto.tournament.TournamentDTO;
 import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
@@ -116,13 +116,13 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/current_round", method = RequestMethod.POST)
-    public void setRoundResultsSwiss(@RequestBody List<GameTitle> games) {
+    public void setRoundResultsSwiss(@RequestBody List<GameTitleDTO> games) {
         System.out.println(games);
         tournamentService.setRoundResults(tournamentSwiss, games);
     }
 
     @RequestMapping(value = "/current_round/robin", method = RequestMethod.POST)
-    public void setRoundResultsRound(@RequestBody List<GameTitle> games) {
+    public void setRoundResultsRound(@RequestBody List<GameTitleDTO> games) {
         tournamentService.setRoundResults(tournamentRR, games);
     }
 }
