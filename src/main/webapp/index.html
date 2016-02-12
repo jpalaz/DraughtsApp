@@ -15,9 +15,13 @@
 			<button id="prev-step" class="ctrl-btn"> < </button>	<button id="next-step" class="ctrl-btn"> > </button>
 		</div>
 	</div>
-	<ul id="game-steps">
-	</ul>
+	<div id="game-plies">
+	</div>
 </div>
+<!-- class="list-element-comment"-->
+<script id="plyTemplate" type="text/template">
+	<%= commentBefore %> <strong><%= indexString %></strong> <%= commentAfter %>
+</script>
 
 <script type="text/javascript" src="js/underscore.js"></script>
 <script type="text/javascript" src="js/jquery.js"></script>

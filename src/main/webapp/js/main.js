@@ -5,6 +5,21 @@ $(function () {
         Collections: {}
     };
 
+    window.App.template = function(id) {
+        return _.template( $('#' + id).html() );
+    };
+
+    window.App.hash = [
+        'b8', 'd8', 'f8', 'h8',
+        'a7', 'c7', 'e7', 'g7',
+        'b6', 'd6', 'f6', 'h6',
+        'a5', 'c5', 'e5', 'g5',
+        'b4', 'd4', 'f4', 'h4',
+        'a3', 'c3', 'e3', 'g3',
+        'b2', 'd2', 'f2', 'h2',
+        'a1', 'c1', 'e1', 'g1'
+    ];
+
     App.Models.Ply = Backbone.Model.extend({
         default: {
             index: 1,
@@ -13,15 +28,14 @@ $(function () {
             rate: undefined,
             from: 22,
             to: 18,
-            position: {
+            position: { // Todo: Expand to it's own Model
                 whites: [],
                 whiteKings: [],
                 blacks: [],
                 blackKings: [],
                 //isWhiteMove: true
                 whiteMove: true
-            },
-            alternatives: []
+            }
         }
     });
 
@@ -29,121 +43,85 @@ $(function () {
         model: App.Models.Ply
     });
 
-    function parsePlies(response) {
-        var parsedMoves = [];
-        var moves = response["mainMoves"]["moves"];
-        for (var i = 0; i < moves.length; i++) {
-            var ply = moves[i];
-            //if (!ply["alternatives"]) ply["alternatives"] = [];
-            if (!ply["plyPosition"]["position"].whites) ply["plyPosition"]["position"].whites = [];
-            if (!ply["plyPosition"]["position"].whiteKings) ply["plyPosition"]["position"].whiteKings = [];
-            if (!ply["plyPosition"]["position"].blacks) ply["plyPosition"]["position"].blacks = [];
-            if (!ply["plyPosition"]["position"].blackKings) ply["plyPosition"]["position"].blackKings = [];
-
-            parsedMoves.push(new App.Models.Ply({
-                index: ply["number"],
-                commentBefore: ply["comment"]["commentBefore"],
-                commentAfter: ply["comment"]["commentAfter"],
-                rate: ply["comment"]["rate"],
-                from: ply["plyPosition"]["from"],
-                to: ply["plyPosition"]["to"],
-                position: ply["plyPosition"]["position"],
-                alternatives: ply["alternatives"]
-            }));
-        }
-        return parsedMoves;
-    }
-
     App.Models.Game = Backbone.Model.extend({
         url: 'http://localhost:8080/games'
+    });
+
+    App.Views.Ply = Backbone.View.extend({
+        tagName: 'span',
+        className: 'ply',
+        template: App.template('plyTemplate'),
+        events: {
+            'click' : 'selectPly'
+        },
+
+        selectPly: function() {
+            alert("A ply was clicked!");
+        },
+        render: function() {
+            var ply = this.model;
+            var plyNotation = this.getPlyNotation(ply);
+            var plyLayout;
+            if (!ply.get("position").whiteMove) {
+                plyLayout = ply.get('index') + ". " + plyNotation;
+            } else
+                plyLayout = ply.get('index')+ ". ... " + plyNotation;
+            ply.set('indexString', plyLayout);
+            this.$el.html( this.template(ply.toJSON()));
+            return this;
+        },
+        getPlyNotation: function (ply) {
+            var from = App.hash[ply.get('from') - 1];
+            var to = App.hash[ply.get('to') - 1];
+            return from + "-" + to;
+        }
+    });
+
+    App.Views.Plies = Backbone.View.extend({
+        tagName: 'div',
+
+        initialize: function(){
+            this.collection.on('add', this.addOne, this);
+        },
+
+        render: function(){
+            this.collection.each(this.addOne, this);
+            return this;
+        },
+
+        addOne: function(ply){
+            var plyView = new App.Views.Ply({ model: ply });
+            this.$el.append(plyView.render().el);
+        }
     });
 
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
         currentStep: 0,
-        hash: [
-            'b8', 'd8', 'f8', 'h8',
-            'a7', 'c7', 'e7', 'g7',
-            'b6', 'd6', 'f6', 'h6',
-            'a5', 'c5', 'e5', 'g5',
-            'b4', 'd4', 'f4', 'h4',
-            'a3', 'c3', 'e3', 'g3',
-            'b2', 'd2', 'f2', 'h2',
-            'a1', 'c1', 'e1', 'g1'
-        ],
         begin: undefined,
+
         initialize: function () {
             this.createBoard(this.brdSize);
             var context = this;
-            var game = new App.Models.Game;
+            var gameView = new App.Models.Game;
 
-            game.fetch({
+            gameView.fetch({
                 success: function (form) {
-                    var g = form.attributes;
-
-                    context.begin = g.begin;
+                    var game = form.attributes;
+                    context.begin = game.begin;
                     if (!context.begin.whiteKings) context.begin.whiteKings = [];
                     if (!context.begin.blackKings) context.begin.blackKings = [];
                     if (!context.begin.whites) context.begin.whites = [];
                     if (!context.begin.blacks) context.begin.blacks = [];
-                    console.log(context.begin);
-                    var plies = parsePlies(g);
-                    for (var i = 0; i < plies.length; i++) {
-                        context.collection.add(plies[i]);
-                    }
-                    context.fillGameStepsSidebar();
+
+                    var plies = context.getPliesArray(game);
+                    context.pliesCollection = new App.Collections.Plies(plies);
+                    var pliesView = new App.Views.Plies({collection: context.pliesCollection });
+                    $('#game-plies').append(pliesView.render().el);
+
                     context.render(0);
                 }
             });
-        },
-        fillGameStepsSidebar: function () {
-            var sep = ',';
-            for (var i = 0; i < this.collection.length; i++) {
-                if (i == this.collection.length - 1) sep = '.';
-                this.insertPlyIntoStepsSidebar(this.collection.at(i).attributes, sep, '#game-steps', false);
-            }
-        },
-        insertPlyIntoStepsSidebar: function (ply, sep, appendLocation, isAlternative) {
-            var listEl = this.determineListEl(ply);
-            var stepNum = '';
-            var classPostfix = '';
-            if (isAlternative) classPostfix = '-alternative';
-
-            //if (!ply.position.isWhiteMove) {
-            if (!ply.position.whiteMove) {
-                sep = ". ";
-            } else sep = ". ... "
-
-            if (ply.commentBefore != undefined)
-                $(appendLocation).append('<li id="' + ply.index + '-commentBefore" class="list-element-comment' + classPostfix + '"> '
-                    + ply.commentBefore + ' </li>');
-
-            $(appendLocation).append('<li id="' + ply.index + '-step" class="list-element-ply' + classPostfix + '">'
-                + ply.index + sep + listEl + '</li>');
-
-            if (ply.commentAfter != undefined)
-                $(appendLocation).append('<li id="' + ply.index + '-commentAfter" class="list-element-comment' + classPostfix + '"> '
-                    + ply.commentAfter + ' </li>');
-
-            if (ply.alternatives != undefined) {
-                $(appendLocation).append('<li id="' + ply.index + '-alternatives" class="list-element-alternative' + classPostfix + '"></li>');
-
-                var alternative = $('#' + ply.index + '-alternatives');
-
-                alternative.append('{ ');
-                var sep = ',';
-                for (var i = 0; i < ply.alternatives.length; i++) {
-                    if (i == ply.alternatives.length - 1) sep = '.';
-                    this.insertPlyIntoStepsSidebar(ply.alternatives[i].attributes, sep, alternative, true);
-                }
-
-                alternative.append(' }');
-            }
-        },
-        determineListEl: function (ply) {
-            var from = this.hash[ply.from - 1];
-            var to = this.hash[ply.to - 1];
-            return from + "-" + to;
         },
         createBoard: function (brdSize) {
             var firstSquareIsWhite;
@@ -175,7 +153,7 @@ $(function () {
                     return "white";
         },
         determineSquareCoordinate: function (i, j) {
-            return this.hash[
+            return App.hash[
             (this.brdSize + 1 - i - 1) * 4 + Math.ceil(j / 2) - 1
                 ];
         },
@@ -187,26 +165,26 @@ $(function () {
         },
         events: {
             "click #next-step": "nextStep",
-            "click #prev-step": "prevStep",
+            "click #prev-step": "prevStep"
         },
         nextStep: function () {
-            if (this.currentStep < this.collection.length) {
-                ++this.currentStep
+            if (this.currentStep < this.pliesCollection.length) {
+                ++this.currentStep;
                 this.render(this.currentStep);
             }
         },
         prevStep: function () {
             if (this.currentStep > 0) {
-                --this.currentStep
+                --this.currentStep;
                 this.render(this.currentStep);
             }
         },
         putFigure: function (coordinate10x10, className) {
-            var coordinate8x8 = this.hash[coordinate10x10 - 1];
+            var coordinate8x8 = App.hash[coordinate10x10 - 1];
             $('#' + coordinate8x8 + '-square').addClass(className);
         },
         clearSquare: function (i) {
-            var coordinate8x8 = this.hash[i - 1];
+            var coordinate8x8 = App.hash[i - 1];
             var $coordSquare = $('#' + coordinate8x8 + '-square');
             $coordSquare.removeClass('white-figure');
             $coordSquare.removeClass('black-figure');
@@ -216,7 +194,7 @@ $(function () {
         render: function (index) {
             var playerPosition;
             if (index != 0) {
-                playerPosition = this.collection.at(index - 1).attributes.position;
+                playerPosition = this.pliesCollection.at(index - 1).attributes.position;
             } else {
                 playerPosition = this.begin;
             }
@@ -227,19 +205,43 @@ $(function () {
             for (var i = 1; i <= this.brdSize * this.brdSize / 2; i++) {
                 this.clearSquare(i);
             }
-
-            for (var i = 0; i < whites.length; i++) {
+            for ( i = 0; i < whites.length; i++) {
                 this.putFigure(whites[i], 'white-figure');
             }
-            for (var i = 0; i < blacks.length; i++) {
+            for ( i = 0; i < blacks.length; i++) {
                 this.putFigure(blacks[i], 'black-figure');
             }
-            for (var i = 0; i < whiteKings.length; i++) {
+            for ( i = 0; i < whiteKings.length; i++) {
                 this.putFigure(whiteKings[i], 'white-queen');
             }
-            for (var i = 0; i < blackKings.length; i++) {
+            for ( i = 0; i < blackKings.length; i++) {
                 this.putFigure(blackKings[i], 'black-queen');
             }
+        },
+
+        getPliesArray: function (response) {
+            var parsedMoves = [];
+            var moves = response["mainMoves"]["moves"];
+            for (var i = 0; i < moves.length; i++) {
+                var ply = moves[i];
+                //if (!ply["alternatives"]) ply["alternatives"] = [];
+                if (!ply["plyPosition"]["position"].whites) ply["plyPosition"]["position"].whites = [];
+                if (!ply["plyPosition"]["position"].whiteKings) ply["plyPosition"]["position"].whiteKings = [];
+                if (!ply["plyPosition"]["position"].blacks) ply["plyPosition"]["position"].blacks = [];
+                if (!ply["plyPosition"]["position"].blackKings) ply["plyPosition"]["position"].blackKings = [];
+
+                parsedMoves.push(new App.Models.Ply({
+                    index: ply["number"],
+                    commentBefore: ply["comment"]["commentBefore"],
+                    commentAfter: ply["comment"]["commentAfter"],
+                    rate: ply["comment"]["rate"],
+                    from: ply["plyPosition"]["from"],
+                    to: ply["plyPosition"]["to"],
+                    position: ply["plyPosition"]["position"],
+                    alternatives: ply["alternatives"]
+                }));
+            }
+            return parsedMoves;
         }
     });
 
@@ -254,7 +256,7 @@ $(function () {
         getRowClassName: function () {
             return 'row10x10';
         },
-        determineListEl: function (ply) {
+        getPlyNotation: function (ply) {
             return ply.from + " - " + ply.to;
         },
         putFigure: function (coordinate10x10, className) {
