@@ -31,7 +31,7 @@ public class SwissGenerator {
         }
         int gamesAmount = players.size() / 2;
         List<GameTitle> games = new ArrayList<>();
-        rounds.add(new Round(tournament.getBegin(), games));
+        rounds.add(new Round(tournament.getBegin(), games, 1));
         boolean isFirstWhite = true;
         for (int i = 0; i < gamesAmount; ++i, isFirstWhite = !isFirstWhite) {
             if (isFirstWhite) {

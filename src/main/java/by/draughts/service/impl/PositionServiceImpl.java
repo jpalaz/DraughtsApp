@@ -2,11 +2,14 @@ package by.draughts.service.impl;
 
 import by.draughts.model.ply.PlyPosition;
 import by.draughts.model.game.Position;
+import by.draughts.service.PositionService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PositionService {
+@Service
+public class PositionServiceImpl implements PositionService {
     private Field[][] board;
     private Position position;
     private List<PlyPosition> possibleMoves;
@@ -84,7 +87,7 @@ public class PositionService {
         draughts.add((byte) 9);
         temp.setWhites(draughts);
 
-        PositionService o = new PositionService();
+        PositionServiceImpl o = new PositionServiceImpl();
         List<PlyPosition> obj = o.getPossibleMoves(temp);
     }
 
@@ -229,6 +232,7 @@ public class PositionService {
         }
     }
 
+    @Override
     public List<PlyPosition> getPossibleMoves(Position obj) {
         position = obj;
         fillBoard();

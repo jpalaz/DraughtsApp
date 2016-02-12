@@ -1,42 +1,51 @@
 package by.draughts.model.person;
 
 import by.draughts.dto.tournament.PlayerDTO;
+import by.draughts.model.tournament.Coefficient;
+import by.draughts.model.tournament.Result;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class Player {
-    private PersonName name;
-    private short points;
+    private Person person;
     private byte gamesPlayed;
     private int sortingNumber;
-    private int place;
-    private List<Player> rivals;
+    private List<Result> results;
 
     private final static SortingComparator sortingComparator = new SortingComparator();
 
     public Player() {
+        System.out.println("Empty Player");
+        results = new ArrayList<>();
     }
 
     public Player(String surname) {
-        name = new PersonName(surname);
+        System.out.println("String Player");
+        person = new Person(surname);
+        gamesPlayed = 0;
+        results = new ArrayList<>();
     }
 
     public Player(PlayerDTO playerDTO) {
-        name = playerDTO.getName();
-        points = playerDTO.getPoints();
+        System.out.println("DTO Player");
+        person = playerDTO.getPerson();
         gamesPlayed = playerDTO.getGamesPlayed();
-        rivals = new ArrayList<>();
+        results = new ArrayList<>();
+    }
+
+    public void increaseGamesPlayed() {
+        gamesPlayed++;
     }
 
     private static class SortingComparator implements Comparator<Player> {
+
         @Override
         public int compare(Player o1, Player o2) {
             return o1.getSortingNumber() - o2.getSortingNumber();
         }
     }
-
     public static SortingComparator getSortingComparator() {
         return sortingComparator;
     }
@@ -49,28 +58,12 @@ public class Player {
         this.sortingNumber = sortingNumber;
     }
 
-    public int getPlace() {
-        return place;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPlace(int place) {
-        this.place = place;
-    }
-
-    public PersonName getName() {
-        return name;
-    }
-
-    public void setName(PersonName name) {
-        this.name = name;
-    }
-
-    public short getPoints() {
-        return points;
-    }
-
-    public void setPoints(short points) {
-        this.points = points;
+    public void setPerson(Person name) {
+        this.person = name;
     }
 
     public byte getGamesPlayed() {
@@ -81,11 +74,22 @@ public class Player {
         this.gamesPlayed = gamesPlayed;
     }
 
-    public List<Player> getRivals() {
-        return rivals;
+    public List<Result> getResults() {
+        return results;
     }
 
-    public void setRivals(List<Player> rivals) {
-        this.rivals = rivals;
+    public Result getResult(int index) {
+        return results.get(index);
+    }
+
+    public void setResults(List<Result> results) {
+        this.results = results;
+    }
+
+    public void setResults(int size) {
+        results = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            results.add(new Result());
+        }
     }
 }

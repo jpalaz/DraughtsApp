@@ -66,8 +66,8 @@ public class TournamentController {
         return cal.getTime();
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public Tournament getTournament() {
+    @RequestMapping(value = "/robin", method = RequestMethod.GET)
+    public Tournament getTournamentRobin() {
         tournamentService.generateRoundRoundGames(tournamentRR);
         return tournamentRR;
     }
@@ -83,15 +83,27 @@ public class TournamentController {
         return tournamentRR.getRounds();
     }
 
-    @RequestMapping(value = "/swiss/next_round/{currentRound}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public Round getTournamentSwissNextRound(@PathVariable Integer currentRound) {
-        tournamentSwiss.setPlayedRounds(currentRound);
-        return tournamentService.getNextRound(tournamentSwiss);
+    @RequestMapping(value = "/robin/next_round", method = RequestMethod.GET)
+    public Round getTournamentRobinNextRound() {
+        if (tournamentRR.getPlayedRounds() == tournamentRR.getRoundAmount()) {
+            tournamentRR.setPlayedRounds(0);
+        }
+        Round round = tournamentService.getNextRound(tournamentRR);
+        return round;
     }
 
-    @RequestMapping(value = "/players", method = RequestMethod.GET)
-    public List<Player> getTournamentPlayers() {
+    @RequestMapping(value = "/swiss/next_round", method = RequestMethod.GET)
+    public Round getTournamentSwissNextRound() {
+        return tournamentService.getNextRound(tournamentSwiss);
+     }
+
+    @RequestMapping(value = "/robin/players", method = RequestMethod.GET)
+    public List<Player> getTournamentRobinPlayers() {
+        return tournamentRR.getPlayers();
+    }
+
+    @RequestMapping(value = "/swiss/players", method = RequestMethod.GET)
+    public List<Player> getTournamentSwissPlayers() {
         return tournamentSwiss.getPlayers();
     }
 

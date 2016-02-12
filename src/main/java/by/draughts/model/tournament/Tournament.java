@@ -7,6 +7,7 @@ import by.draughts.model.game.GameTitle;
 import by.draughts.model.person.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -18,12 +19,12 @@ public class Tournament {
     private int playedRounds;
     private Date begin;
     private Date end;
-
     private TournamentSystem system;
     private List<Round> rounds;
     private List<Player> players;
 
     public Tournament() {
+        rounds = new ArrayList<>();
     }
 
     public Tournament(TournamentDTO tournamentDTO) {
@@ -35,6 +36,7 @@ public class Tournament {
         begin = tournamentDTO.getBegin();
         end = tournamentDTO.getEnd();
         system = tournamentDTO.getSystem();
+        rounds = new ArrayList<>();
 
         players = new ArrayList<>();
         for (PlayerDTO playerDTO : tournamentDTO.getPlayers()) {
@@ -43,7 +45,7 @@ public class Tournament {
     }
 
     public Round getRound(int roundIndex) throws NoSuchRoundException {
-        if (rounds != null && roundIndex >= 0 && roundIndex < rounds.size())
+        if (rounds != null && roundIndex >= 0 && roundIndex < rounds.size() && roundIndex < roundAmount)
             return rounds.get(roundIndex);
         throw new NoSuchRoundException();
     }
@@ -128,7 +130,7 @@ public class Tournament {
         this.players = players;
     }
 
-    public void setCurrentGamesResults(List<GameTitle> games) {
-        rounds.get(playedRounds).setGames(games);
+    public void setCurrentRoundPlayed() {
+        playedRounds++;
     }
 }

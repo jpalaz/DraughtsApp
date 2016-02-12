@@ -2,7 +2,8 @@ package by.draughts.model.game;
 
 import by.draughts.model.person.Player;
 
-public class GameTitle {
+public class GameTitle implements Comparable<GameTitle> {
+    private int id;
     private Player white;
     private Player black;
     private GameResult result;
@@ -29,6 +30,19 @@ public class GameTitle {
         this.white = white;
         this.black = black;
         this.result = result;
+    }
+
+    @Override
+    public int compareTo(GameTitle game) {
+        return this.getId() - game.getId();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Player getWhite() {

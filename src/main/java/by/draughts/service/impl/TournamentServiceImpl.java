@@ -1,7 +1,10 @@
 package by.draughts.service.impl;
 
+import by.draughts.dto.tournament.GameTitleDTO;
 import by.draughts.model.exception.NoSuchRoundException;
 import by.draughts.model.game.GameTitle;
+import by.draughts.model.person.Player;
+import by.draughts.model.tournament.Result;
 import by.draughts.model.tournament.Round;
 import by.draughts.model.tournament.Tournament;
 import by.draughts.service.TournamentService;
@@ -35,7 +38,10 @@ public class TournamentServiceImpl implements TournamentService {
 
     private Round generateNextRound(Tournament tournament) {
         List<GameTitle> games = new ArrayList<>();
-        Round round = new Round(new Date(), games);
+        int roundNumber = 1;
+        if (tournament.getRounds() != null)
+            roundNumber = tournament.getRounds().size() + 1;
+        Round round = new Round(new Date(), games, roundNumber);
         tournament.getRounds().add(round);
         switch (tournament.getSystem()) {
             case SWISS:
@@ -58,10 +64,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void setRoundResults(Tournament tournament, List<GameTitle> games) {
-        tournament.setCurrentGamesResults(games);
-        for (GameTitle game : games) {
-            
+    public void setRoundResults(Tournament tournament, List<GameTitleDTO> games) {
+        try {
+            Round currentRound = tournament.getRound(tournament.getPlayedRounds());
+            currentRound.setCurrentGamesResults(games);
+            tournament.setCurrentRoundPlayed();
+        } catch (NoSuchRoundException e) {
+            e.printStackTrace(); // TODO: implement handling properly!
         }
+//        return null;
     }
 }
