@@ -118,13 +118,14 @@ public class TournamentController {
         }
     }
 
-    @RequestMapping(value = "/swiss/current_round", method = RequestMethod.POST)
+    @RequestMapping(value = "/current_round", method = RequestMethod.POST)
     public void setRoundResultsSwiss(@RequestBody List<GameTitleDTO> games) {
+        System.out.println(games);
         tournamentService.setRoundResults(tournamentSwiss, games);
     }
 
-    @RequestMapping(value = "/robin/current_round", method = RequestMethod.POST)
-    public void setRoundResultsRobin(@RequestBody List<GameTitleDTO> games) {
+    @RequestMapping(value = "/current_round/robin", method = RequestMethod.POST)
+    public void setRoundResultsRound(@RequestBody List<GameTitleDTO> games) {
         tournamentService.setRoundResults(tournamentRR, games);
     }
 }
