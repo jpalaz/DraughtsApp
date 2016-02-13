@@ -20,6 +20,51 @@ $(function () {
         'a1', 'c1', 'e1', 'g1'
     ];
 
+    App.Views.Position = Backbone.View.extend({
+        render: function (position) {
+            var whites = position.get('whites');
+            var blacks = position.get('blacks');
+            var whiteKings = position.get('whiteKings');
+            var blackKings = position.get('blackKings');
+            for (var i = 1; i <= this.brdSize * this.brdSize / 2; i++) {
+                this.clearSquare(i);
+            }
+            for ( i = 0; i < whites.length; i++) {
+                this.putFigure(whites[i], 'white-figure');
+            }
+            for ( i = 0; i < blacks.length; i++) {
+                this.putFigure(blacks[i], 'black-figure');
+            }
+            for ( i = 0; i < whiteKings.length; i++) {
+                this.putFigure(whiteKings[i], 'white-queen');
+            }
+            for ( i = 0; i < blackKings.length; i++) {
+                this.putFigure(blackKings[i], 'black-queen');
+            }
+        },
+        putFigure: function (coordinate10x10, className) {
+            var coordinate8x8 = App.hash[coordinate10x10 - 1];
+            $('#' + coordinate8x8 + '-square').addClass(className);
+        },
+        clearSquare: function (i) {
+            var coordinate8x8 = App.hash[i - 1];
+            var $coordSquare = $('#' + coordinate8x8 + '-square');
+            $coordSquare.removeClass('white-figure');
+            $coordSquare.removeClass('black-figure');
+            $coordSquare.removeClass('white-queen');
+            $coordSquare.removeClass('black-queen');
+        }
+    });
+
+    App.Models.Position = Backbone.Model.extend({
+        whites: [],
+        whiteKings: [],
+        blacks: [],
+        blackKings: [],
+        //isWhiteMove: true
+        whiteMove: true,
+    });
+
     App.Models.Ply = Backbone.Model.extend({
         default: {
             index: 1,
@@ -28,14 +73,7 @@ $(function () {
             rate: undefined,
             from: 22,
             to: 18,
-            position: { // Todo: Expand to it's own Model
-                whites: [],
-                whiteKings: [],
-                blacks: [],
-                blackKings: [],
-                //isWhiteMove: true
-                whiteMove: true
-            }
+            position: new App.Models.Position
         }
     });
 
@@ -52,7 +90,7 @@ $(function () {
         className: 'ply',
         template: App.template('plyTemplate'),
         events: {
-            'click' : 'selectPly'
+            'click > strong' : 'selectPly'
         },
 
         selectPly: function() {
@@ -62,7 +100,7 @@ $(function () {
             var ply = this.model;
             var plyNotation = this.getPlyNotation(ply);
             var plyLayout;
-            if (!ply.get("position").whiteMove) {
+            if (!ply.get("position").get('whiteMove')) {
                 plyLayout = ply.get('index') + ". " + plyNotation;
             } else
                 plyLayout = ply.get('index')+ ". ... " + plyNotation;
@@ -97,8 +135,9 @@ $(function () {
 
     App.Views.Game = Backbone.View.extend({
         brdSize: 8,
-        currentStep: 0,
+        currentPlyIndex: 0,
         begin: undefined,
+        positionView: undefined,
 
         initialize: function () {
             this.createBoard(this.brdSize);
@@ -108,18 +147,20 @@ $(function () {
             gameView.fetch({
                 success: function (form) {
                     var game = form.attributes;
-                    context.begin = game.begin;
-                    if (!context.begin.whiteKings) context.begin.whiteKings = [];
-                    if (!context.begin.blackKings) context.begin.blackKings = [];
-                    if (!context.begin.whites) context.begin.whites = [];
-                    if (!context.begin.blacks) context.begin.blacks = [];
+                    context.begin = new App.Models.Position(game.begin);
+                    if (!context.begin.get('whiteKings')) context.begin.set('whiteKings',[]);
+                    if (!context.begin.get('blackKings')) context.begin.set('blackKings',[]);
+                    if (!context.begin.get('whites')) context.begin.set('whites',[]);
+                    if (!context.begin.get('blacks')) context.begin.set('blacks',[]);
 
                     var plies = context.getPliesArray(game);
                     context.pliesCollection = new App.Collections.Plies(plies);
                     var pliesView = new App.Views.Plies({collection: context.pliesCollection });
                     $('#game-plies').append(pliesView.render().el);
 
-                    context.render(0);
+                    context.positionView = new App.Views.Position({model: context.begin});
+                    context.positionView.render(context.begin);
+
                 }
             });
         },
@@ -168,56 +209,20 @@ $(function () {
             "click #prev-step": "prevStep"
         },
         nextStep: function () {
-            if (this.currentStep < this.pliesCollection.length) {
-                ++this.currentStep;
-                this.render(this.currentStep);
+            if (this.currentPlyIndex < this.pliesCollection.length) {
+                ++this.currentPlyIndex;
+                var position = this.pliesCollection.at(this.currentPlyIndex).get('position');
+                this.positionView.render(position);
             }
         },
         prevStep: function () {
-            if (this.currentStep > 0) {
-                --this.currentStep;
-                this.render(this.currentStep);
+            if (this.currentPlyIndex > 0) {
+                --this.currentPlyIndex;
+                var position = this.pliesCollection.at(this.currentPlyIndex).get('position');
+                this.positionView.render(position);
             }
         },
-        putFigure: function (coordinate10x10, className) {
-            var coordinate8x8 = App.hash[coordinate10x10 - 1];
-            $('#' + coordinate8x8 + '-square').addClass(className);
-        },
-        clearSquare: function (i) {
-            var coordinate8x8 = App.hash[i - 1];
-            var $coordSquare = $('#' + coordinate8x8 + '-square');
-            $coordSquare.removeClass('white-figure');
-            $coordSquare.removeClass('black-figure');
-            $coordSquare.removeClass('white-queen');
-            $coordSquare.removeClass('black-queen');
-        },
-        render: function (index) {
-            var playerPosition;
-            if (index != 0) {
-                playerPosition = this.pliesCollection.at(index - 1).attributes.position;
-            } else {
-                playerPosition = this.begin;
-            }
-            var whites = playerPosition.whites;
-            var blacks = playerPosition.blacks;
-            var whiteKings = playerPosition.whiteKings;
-            var blackKings = playerPosition.blackKings;
-            for (var i = 1; i <= this.brdSize * this.brdSize / 2; i++) {
-                this.clearSquare(i);
-            }
-            for ( i = 0; i < whites.length; i++) {
-                this.putFigure(whites[i], 'white-figure');
-            }
-            for ( i = 0; i < blacks.length; i++) {
-                this.putFigure(blacks[i], 'black-figure');
-            }
-            for ( i = 0; i < whiteKings.length; i++) {
-                this.putFigure(whiteKings[i], 'white-queen');
-            }
-            for ( i = 0; i < blackKings.length; i++) {
-                this.putFigure(blackKings[i], 'black-queen');
-            }
-        },
+
 
         getPliesArray: function (response) {
             var parsedMoves = [];
@@ -237,7 +242,7 @@ $(function () {
                     rate: ply["comment"]["rate"],
                     from: ply["plyPosition"]["from"],
                     to: ply["plyPosition"]["to"],
-                    position: ply["plyPosition"]["position"],
+                    position: new App.Models.Position(ply["plyPosition"]["position"]),
                     alternatives: ply["alternatives"]
                 }));
             }
