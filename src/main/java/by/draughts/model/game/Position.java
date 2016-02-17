@@ -9,7 +9,7 @@ public class Position {
     private List<Byte> blackKings;
     private boolean isWhiteMove;
 
-    public boolean isWhiteMove() {
+    public boolean getIsWhiteMove() {
         return isWhiteMove;
     }
 

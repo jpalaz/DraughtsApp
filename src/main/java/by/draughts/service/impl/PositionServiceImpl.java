@@ -92,7 +92,7 @@ public class PositionServiceImpl implements PositionService {
     }
 
     private void setTo(int draught) {
-        if(position.isWhiteMove()){
+        if(position.getIsWhiteMove()){
             board[getRow((byte)draught)][getColumn((byte)draught)] =Field.WHITE;
         }else{
             board[getRow((byte)draught)][getColumn((byte)draught)] =Field.BLACK;
@@ -113,7 +113,7 @@ public class PositionServiceImpl implements PositionService {
 
     private Position getCurrentPosition() {
         Position result = new Position();
-        result.setIsWhiteMove(!position.isWhiteMove());
+        result.setIsWhiteMove(!position.getIsWhiteMove());
         List<Byte> whites = new ArrayList<>();
         List<Byte> whiteKings = new ArrayList<>();
         List<Byte> blacks = new ArrayList<>();
@@ -238,7 +238,7 @@ public class PositionServiceImpl implements PositionService {
         fillBoard();
         possibleMoves = new ArrayList<>();
 
-        if (obj.isWhiteMove()) {
+        if (obj.getIsWhiteMove()) {
             movesForDraught(Field.WHITE);
         } else {
             movesForDraught(Field.BLACK);
