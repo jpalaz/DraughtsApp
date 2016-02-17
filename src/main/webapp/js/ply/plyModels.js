@@ -12,7 +12,8 @@ var app = app || {};
             rate: undefined,
             from: 0,
             to: 0,
-            position: undefined
+            position: undefined,
+            isBeat: false
         }
     });
 
@@ -20,5 +21,29 @@ var app = app || {};
         model: app.plyModel
     });
 
-    app.plies = new app.pliesCollection();
+    app.possiblePlyModel = Backbone.Model.extend({
+        default: {
+            from: 0,
+            to: 0,
+            position: undefined,
+            isBeat: false
+        }
+    });
+
+    app.possiblePliesCollection = Backbone.Collection.extend({
+        model: app.possiblePlyModel,
+        url: 'http://localhost:8080/position',
+
+        getPossibles: function(positionJSON) {
+            var self = this;
+            this.fetch({
+                data: positionJSON,
+                type: 'POST',
+
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                }
+            });
+        }
+    });
 })(jQuery);

@@ -20,6 +20,8 @@ var app = app || {};
         currentPlyIndex: 0,
         begin: undefined,
         positionView: undefined,
+        possiblePliesCollection: undefined,//new app.possiblePliesModel(),
+        //currentPlySequence: undefined,
 
         initialize: function () {
             this.createBoard(this.brdSize);
@@ -41,6 +43,11 @@ var app = app || {};
                     context.pliesCollection = new app.pliesCollection(plies);
                     var pliesView = new app.pliesView({collection: context.pliesCollection});
                     $('#game-plies').append(pliesView.render().el);
+
+                    context.possiblePliesCollection = new app.possiblePliesCollection();
+                    var possibles = new app.possiblePliesView({collection: context.possiblePliesCollection});
+                    $('#possiblePlies').append(possibles.el);
+                    context.possiblePliesCollection.getPossibles(JSON.stringify(begin));
                 }
             });
         },
