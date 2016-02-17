@@ -14,20 +14,28 @@
 		<div id="game-controller">
 			<button id="prev-step" class="ctrl-btn"> < </button>	<button id="next-step" class="ctrl-btn"> > </button>
 		</div>
+		<div id="possiblePlies">
+		</div>
 	</div>
 	<div id="game-plies">
 	</div>
 </div>
-<!-- class="list-element-comment"-->
+
 <script id="plyTemplate" type="text/template">
 	<%= commentBefore %> <strong><%= indexString %></strong> <%= commentAfter %>
 </script>
 
-<script type="text/javascript" src="js/underscore.js"></script>
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/backbone.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript" src="js/libs/underscore.js"></script>
+<script type="text/javascript" src="js/libs/jquery.js"></script>
+<script type="text/javascript" src="js/libs/backbone.js"></script>
 
+<script type="text/javascript" src="js/ply/plyModels.js"></script>
+<script type="text/javascript" src="js/position/positionModels.js"></script>
+<script type="text/javascript" src="js/game/gameModels.js"></script>
+<script type="text/javascript" src="js/ply/plyViews.js"></script>
+<script type="text/javascript" src="js/ply/possiblePlyViews.js"></script>
+<script type="text/javascript" src="js/position/positionViews.js"></script>
+<script type="text/javascript" src="js/game/gameViews.js"></script>
 
 </body>
 </html>

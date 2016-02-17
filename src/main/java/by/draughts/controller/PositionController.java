@@ -18,7 +18,12 @@ public class PositionController {
     private PositionService positionService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public List<PlyPosition> getGame(@RequestBody Position position) {
+    public List<PlyPosition> getPossibleMoves(@RequestBody Position position) {
+        return positionService.getPossibleMoves(position);
+    }
+
+    @RequestMapping(value = "new_ply", method = RequestMethod.POST)
+    public List<PlyPosition> selectPly(@RequestBody Position position) {
         return positionService.getPossibleMoves(position);
     }
 }
