@@ -1,73 +1,164 @@
 package by.draughts.service.impl;
 
+import by.draughts.model.game.Draught;
 import by.draughts.model.ply.PlyPosition;
 import by.draughts.model.game.Position;
 import by.draughts.service.PositionService;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
 public class PositionServiceImpl implements PositionService {
-    private Field[][] board;
+    private Draught[][] board;
     private Position position;
     private List<PlyPosition> possibleMoves;
+    private Draught currantDraught;
+    private int startPosition;
 
-    private enum Field {
-        WHITE, BLACK, WHITE_KING, BLACK_KING, BEATEN, EMPTY
-    }
-
-    private int getRow(byte draught) {
-        return (draught - 1) / 4;
-    }
-
-    private int getColumn(byte draught) {
-        if (((draught - 1) / 4) % 2 == 0) {
-            return ((draught - 1) % 4) * 2 + 1;
-        } else {
-            return ((draught - 1) % 4) * 2;
+    private void fillBoard() {
+        board = new Draught[8][8];
+        for (Draught obj : position.getDraughts()) {
+            board[obj.getRow()][obj.getColumn()] = obj;
         }
     }
 
-    private void fillPositions(List<Byte> draught, Field fillField) {
-        if (draught != null) {
-            for (Byte obj : draught) {
-                if (obj >= 0 && obj <= 32) {
-                    if (getRow(obj) == 0) {
-                        board[getRow(obj)][getColumn(obj)] = fillField;
-                    } else {
-                        board[getRow(obj)][getColumn(obj)] = fillField;
-                    }
+    private void savePly(int to, List<Integer> intermediates) {
+        PlyPosition move = new PlyPosition();
+        move.setFrom((byte) startPosition);
+        move.setTo((byte) to);
+        if (intermediates != null && !intermediates.isEmpty()) {
+            move.setIntermediates(new ArrayList<>(intermediates));
+        }
+        move.setPosition(getCurrentPosition());
+        possibleMoves.add(move);
+    }
+
+    private Position getCurrentPosition() {
+        Position result = new Position();
+        result.setIsWhiteMove(!position.getIsWhiteMove());
+        List<Draught> draughts = new ArrayList<>();
+        for (Draught obj : position.getDraughts()) {
+            if (!obj.isBeaten()) {
+                draughts.add(new Draught(obj));
+            }
+        }
+        result.setDraughts(draughts);
+        return result;
+    }
+
+    private void movesForDraught() {
+        boolean allowSilentMoves = true;
+        for (Draught obj : position.getDraughts()) {
+            if (obj.isWhite() == position.getIsWhiteMove()) {
+                currantDraught = obj;
+                if (possibleBeat()) {
+                    allowSilentMoves = false;
+                }
+            }
+        }
+        if (allowSilentMoves) {
+            for (Draught obj : position.getDraughts()) {
+                if (obj.isWhite() == position.getIsWhiteMove()) {
+                    currantDraught = obj;
+                    possibleMoves();
                 }
             }
         }
     }
 
-    private byte transformCoordinates(int i, int j) {
-        if (i % 2 == 0) {
-            return (byte) (i * 4 + (j + 1) / 2);
+    private void possibleMoves() {
+        startPosition = currantDraught.getPosition();
+        if (currantDraught.isKing()) {
+            moveDraught(1, -1);
+            moveDraught(1, 1);
+            moveDraught(-1, -1);
+            moveDraught(-1, 1);
         } else {
-            return (byte) (i * 4 + j / 2 + 1);
-        }
-    }
-
-    private void fillBoard() {
-        board = new Field[8][8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                board[i][j] = Field.EMPTY;
+            if (currantDraught.isWhite()) {
+                moveDraught(-1, -1);
+                moveDraught(-1, 1);
+            } else {
+                moveDraught(1, -1);
+                moveDraught(1, 1);
             }
         }
-
-        fillPositions(position.getBlackKings(), Field.BLACK_KING);
-        fillPositions(position.getWhiteKings(), Field.WHITE_KING);
-        fillPositions(position.getBlacks(), Field.BLACK);
-        fillPositions(position.getWhites(), Field.WHITE);
     }
 
-    private boolean isInBoard(int row, int column) {
-        if (row >= 0 && row <= 7 && column >= 0 && column <= 7) {
+    private boolean possibleBeat() {
+        startPosition = currantDraught.getPosition();
+        return beatDraught(null, -1, -1) | beatDraught(null, -1, 1) | beatDraught(null, 1, -1) | beatDraught(null, 1, 1);
+    }
+
+    private void moveDraught(int rowDirect, int columnDirect) {
+        int row = currantDraught.getRow();
+        int column = currantDraught.getColumn();
+        int mul = 1;
+        do {
+            if (Draught.isInBoard(row + mul * rowDirect, column + mul * columnDirect) && board[row + mul * rowDirect][column + mul * columnDirect] == null) {
+                Draught temp = new Draught(currantDraught);
+                currantDraught.moveDraught(row + mul * rowDirect, column + mul * columnDirect);
+                savePly(currantDraught.getPosition(), null);
+                currantDraught.setDraught(temp);
+                mul++;
+            } else {
+                break;
+            }
+        } while (currantDraught.isKing());
+    }
+
+    private boolean beatDraught(List<Integer> intermediates, int rowDirect, int columnDirect) {
+        int row = currantDraught.getRow();
+        int column = currantDraught.getColumn();
+        int mul = 1;
+        int mulAfter = 0;
+        boolean canSave = true;
+        List<Integer> to = new ArrayList<>();
+        while (Draught.isInBoard(row + mul * rowDirect, column + mul * columnDirect) && currantDraught.isKing()
+                && board[row + mul * rowDirect][column + mul * columnDirect] == null) {
+            mul++;
+        }
+        if (Draught.isInBoard(row + (mul + 1) * rowDirect, column + (mul + 1) * columnDirect)
+                && board[row + (mul + 1) * rowDirect][column + (mul + 1) * columnDirect] == null
+                && board[row + mul * rowDirect][column + mul * columnDirect] != null
+                && board[row + mul * rowDirect][column + mul * columnDirect].isWhite() != currantDraught.isWhite()
+                && board[row + mul * rowDirect][column + mul * columnDirect].isBeaten() == false) {
+            Draught temp = new Draught(currantDraught);
+            if (intermediates == null) {
+                intermediates = new ArrayList<>();
+            } else {
+                intermediates.add(currantDraught.getPosition());
+            }
+            board[row + mul * rowDirect][column + mul * columnDirect].setIsBeaten(true);
+            do {
+                currantDraught.moveDraught(row + (mul + mulAfter + 1) * rowDirect, column + (mul + mulAfter + 1) * columnDirect);
+                to.add(currantDraught.getPosition());
+                board[row + (mul + mulAfter + 1) * rowDirect][column + (mul + mulAfter + 1) * columnDirect] = board[row][column];
+                board[row][column] = null;
+                if(mulAfter == 0 && beatDraught(intermediates, rowDirect, columnDirect)){
+                    canSave = false;
+                }
+                if (beatDraught(intermediates, -rowDirect, columnDirect)
+                        | beatDraught(intermediates, rowDirect, -columnDirect)) {
+                    canSave = false;
+                }
+                board[row][column] = board[row + (mul + mulAfter + 1) * rowDirect][column + (mul + mulAfter + 1) * columnDirect];
+                board[row + (mul + mulAfter + 1) * rowDirect][column + (mul + mulAfter + 1) * columnDirect] = null;
+                mulAfter++;
+            }
+            while (Draught.isInBoard(row + (mul + mulAfter + 1) * rowDirect, column + (mul + mulAfter + 1) * columnDirect) && temp.isKing()
+                    && board[row + (mul + mulAfter + 1) * rowDirect][column + (mul + mulAfter + 1) * columnDirect] == null);
+            if(canSave){
+                for(Integer obj:to) {
+                    currantDraught.moveDraught(obj);
+                    savePly(obj, intermediates);
+                    currantDraught.setDraught(temp);
+                }
+            }
+            board[row + mul * rowDirect][column + mul * columnDirect].setIsBeaten(false);
+            currantDraught.setDraught(temp);
+            if(!intermediates.isEmpty()){
+                intermediates.remove(intermediates.size()-1);
+            }
             return true;
         }
         return false;
@@ -75,174 +166,53 @@ public class PositionServiceImpl implements PositionService {
 
     public static void main(String[] args) {
         Position temp = new Position();
-        ArrayList<Byte> draughts = new ArrayList<>();
+        ArrayList<Draught> draughts = new ArrayList<>();
 
+        Draught dr = new Draught();
+        dr.setRow(1);
+        dr.setColumn(0);
+        dr.setIsKing(true);
+        dr.setPosition(Draught.transformCoordinates(dr.getRow(), dr.getColumn()));
+        draughts.add(dr);
 
-        draughts.add((byte) 1);
-        temp.setBlacks(draughts);
+        dr = new Draught();
+        dr.setRow(2);
+        dr.setColumn(1);
+        dr.setIsWhite(true);
+        dr.setPosition(Draught.transformCoordinates(dr.getRow(), dr.getColumn()));
+        draughts.add(dr);
 
-        draughts = new ArrayList<>();
-        draughts.add((byte) 17);
-        draughts.add((byte) 26);
-        draughts.add((byte) 9);
-        temp.setWhites(draughts);
+        dr = new Draught();
+        dr.setRow(5);
+        dr.setColumn(4);
+        dr.setIsWhite(true);
+        dr.setPosition(Draught.transformCoordinates(dr.getRow(), dr.getColumn()));
+        draughts.add(dr);
 
+        dr = new Draught();
+        dr.setRow(5);
+        dr.setColumn(6);
+        dr.setIsWhite(true);
+        dr.setPosition(Draught.transformCoordinates(dr.getRow(), dr.getColumn()));
+        draughts.add(dr);
+
+        dr = new Draught();
+        dr.setRow(3);
+        dr.setColumn(6);
+        dr.setIsWhite(true);
+        dr.setPosition(Draught.transformCoordinates(dr.getRow(), dr.getColumn()));
+        draughts.add(dr);
+
+        temp.setDraughts(draughts);
         PositionServiceImpl o = new PositionServiceImpl();
         List<PlyPosition> obj = o.getPossibleMoves(temp);
     }
 
-    private void setTo(int draught) {
-        if(position.getIsWhiteMove()){
-            board[getRow((byte)draught)][getColumn((byte)draught)] =Field.WHITE;
-        }else{
-            board[getRow((byte)draught)][getColumn((byte)draught)] =Field.BLACK;
-        }
-    }
-
-    private void unsetTo(int draught) {
-        board[getRow((byte)draught)][getColumn((byte)draught)] =Field.EMPTY;
-    }
-
-    private List<Byte> setListOfDraughts(List<Byte> obj) {
-        if (!obj.isEmpty()) {
-            return obj;
-        } else {
-            return null;
-        }
-    }
-
-    private Position getCurrentPosition() {
-        Position result = new Position();
-        result.setIsWhiteMove(!position.getIsWhiteMove());
-        List<Byte> whites = new ArrayList<>();
-        List<Byte> whiteKings = new ArrayList<>();
-        List<Byte> blacks = new ArrayList<>();
-        List<Byte> blackKings = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                switch (board[i][j]) {
-                    case WHITE:
-                        whites.add(transformCoordinates(i, j));
-                        break;
-                    case WHITE_KING:
-                        whiteKings.add(transformCoordinates(i, j));
-                        break;
-                    case BLACK:
-                        blacks.add(transformCoordinates(i, j));
-                        break;
-                    case BLACK_KING:
-                        blackKings.add(transformCoordinates(i, j));
-                        break;
-                }
-            }
-        }
-        result.setWhites(setListOfDraughts(whites));
-        result.setWhiteKings(setListOfDraughts(whiteKings));
-        result.setBlacks(setListOfDraughts(blacks));
-        result.setBlackKings(setListOfDraughts(blackKings));
-        return result;
-    }
-
-    private boolean possibleBeat(PlyPosition move, int row, int column, int rowDirection, int columnDirection, Field beatenColour) {
-        if (isInBoard(row + 2 * rowDirection, column + 2 * columnDirection) && board[row + rowDirection][column + columnDirection] == beatenColour &&
-                board[row + 2 * rowDirection][column + 2 * columnDirection] == Field.EMPTY) {
-            board[row + rowDirection][column + columnDirection] = Field.BEATEN;
-            if (move == null) {
-                move = new PlyPosition();
-                move.setFrom(transformCoordinates(row, column));
-                move.setBeat(true);
-            } else {
-                if (move.getIntermediats() == null) {
-                    move.setIntermediats(new ArrayList<>());
-                }
-                move.addIntermediat(move.getTo());
-
-            }
-            move.setTo(transformCoordinates(row + 2 * rowDirection, column + 2 * columnDirection));
-
-            boolean continueBeat1 = possibleBeat(move, row + 2 * rowDirection, column + 2 * columnDirection, -1, -1, beatenColour);
-            boolean continueBeat2 = possibleBeat(move, row + 2 * rowDirection, column + 2 * columnDirection, -1, 1, beatenColour);
-            boolean continueBeat3 = possibleBeat(move, row + 2 * rowDirection, column + 2 * columnDirection, 1, -1, beatenColour);
-            boolean continueBeat4 = possibleBeat(move, row + 2 * rowDirection, column + 2 * columnDirection, 1, 1, beatenColour);
-            if (!continueBeat1 && !continueBeat2 && !continueBeat3 && !continueBeat4) {
-                setTo(move.getTo());
-                PlyPosition temp = new PlyPosition(move);
-                temp.setPosition(getCurrentPosition());
-                possibleMoves.add(temp);
-                unsetTo(move.getTo());
-            }
-            if (move.getIntermediats() != null && !move.getIntermediats().isEmpty()) {
-                move.setTo(move.getIntermediats().remove(move.getIntermediats().size() - 1));
-            }
-            board[row + rowDirection][column + columnDirection] = beatenColour;
-            return true;
-        }
-        return false;
-    }
-
-    private void possibleMove(int row, int column, int rowDirection, int columnDirection) {
-        if (isInBoard(row + rowDirection, column + columnDirection) && board[row + rowDirection][column + columnDirection] == Field.EMPTY) {
-            PlyPosition move = new PlyPosition();
-            move.setFrom(transformCoordinates(row, column));
-            move.setTo(transformCoordinates(row + rowDirection, column + columnDirection));
-            setTo(move.getTo());
-            move.setPosition(getCurrentPosition());
-            possibleMoves.add(move);
-            unsetTo(move.getTo());
-        }
-    }
-
-    private void movesForDraught(Field colour) {
-        boolean allowSilentMoves = true;
-        int step;
-        Field oppositeColour;
-        if (colour == Field.WHITE) {
-            step = -1;
-            oppositeColour = Field.BLACK;
-        } else {
-            step = 1;
-            oppositeColour = Field.WHITE;
-        }
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] == colour) {
-                    board[i][j] = Field.EMPTY;
-                    boolean possibleBeat1 = possibleBeat(null, i, j, -1, -1, oppositeColour);
-                    boolean possibleBeat2 = possibleBeat(null, i, j, -1, 1, oppositeColour);
-                    boolean possibleBeat3 = possibleBeat(null, i, j, 1, -1, oppositeColour);
-                    boolean possibleBeat4 = possibleBeat(null, i, j, 1, 1, oppositeColour);
-                    if (possibleBeat1 || possibleBeat2 || possibleBeat3 || possibleBeat4) {
-                        allowSilentMoves = false;
-                    }
-                    board[i][j] = colour;
-                }
-            }
-        }
-        if (allowSilentMoves) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if (board[i][j] == colour) {
-                        board[i][j] = Field.EMPTY;
-                        possibleMove(i, j, step, -1);
-                        possibleMove(i, j, step, 1);
-                        board[i][j] = colour;
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
     public List<PlyPosition> getPossibleMoves(Position obj) {
         position = obj;
         fillBoard();
         possibleMoves = new ArrayList<>();
-
-        if (obj.getIsWhiteMove()) {
-            movesForDraught(Field.WHITE);
-        } else {
-            movesForDraught(Field.BLACK);
-        }
+        movesForDraught();
         return possibleMoves;
     }
 }
