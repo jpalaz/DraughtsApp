@@ -11,22 +11,31 @@ public class Draught {
     public Draught() {
     }
 
-    public Draught(Draught obj) {
-        isWhite = obj.isWhite();
-        isKing = obj.isKing();
-        isBeaten = obj.isBeaten();
-        row = obj.getRow();
-        column = obj.getColumn();
-        position = obj.getPosition();
+    public Draught(Draught draught) {
+        isWhite = draught.isWhite();
+        isKing = draught.isKing();
+        isBeaten = draught.isBeaten();
+        row = draught.getRow();
+        column = draught.getColumn();
+        position = draught.getPosition();
     }
 
-    public void setDraught(Draught obj) {
-        isWhite = obj.isWhite;
-        isKing = obj.isKing;
-        isBeaten = obj.isBeaten;
-        row = obj.row;
-        column = obj.column;
-        position = obj.position;
+    public Draught(boolean isWhite, boolean isKing, boolean isBeaten, int position) {
+        this.isWhite = isWhite;
+        this.isKing = isKing;
+        this.isBeaten = isBeaten;
+        this.position = position;
+        this.row = transformGetRow(position);
+        this.column = transformGetColumn(position);
+    }
+
+    public void setDraught(Draught draught) {
+        isWhite = draught.isWhite;
+        isKing = draught.isKing;
+        isBeaten = draught.isBeaten;
+        row = draught.row;
+        column = draught.column;
+        position = draught.position;
     }
 
     public void setRow(int row) {
@@ -43,6 +52,8 @@ public class Draught {
 
     public void setPosition(int position) {
         this.position = position;
+        this.row = transformGetRow(position);
+        this.column = transformGetColumn(position);
     }
 
     public boolean isWhite() {
