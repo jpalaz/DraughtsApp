@@ -3,7 +3,7 @@ package by.draughts.model.ply;
 import java.util.List;
 
 public class Ply {
-    private short number;
+    private int number;
     private PlyPosition metadata;
     private Comment comment;
     private List<Sequence> alternatives;
@@ -15,11 +15,11 @@ public class Ply {
         this.metadata = metadata;
     }
 
-    public short getNumber(){
+    public int getNumber(){
         return number;
     }
 
-    public void setNumber(short number){
+    public void setNumber(int number){
         this.number = number;
     }
 

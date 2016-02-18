@@ -34,6 +34,17 @@ public class GameController {
         game.setId("1");
         game.setBegin(new Position());
 
+        ArrayList<Draught> draughts = new ArrayList<>();
+        game.getBegin().setDraughts(draughts);
+        game.getBegin().setIsWhiteMove(true);
+
+        for (int i = 21; i <= 32; ++i) {
+            draughts.add(new Draught(true, false, false, i));
+        }
+        for (int i = 1; i <= 12; ++i) {
+            draughts.add(new Draught(false, false, false, i));
+        }
+
         Ply ply = new Ply(new PlyPosition());
         game.setMainMoves(new Sequence());
         game.getMainMoves().add(ply);
@@ -59,26 +70,20 @@ public class GameController {
         ply.getComment().setCommentAfter("Comment after first ply");
         ply.getComment().setRate(PlyRate.GOOD);
 
-        ArrayList<Byte> draughts = new ArrayList<>();
-        for (byte i = 21; i <= 32; ++i) {
-            draughts.add(i);
-        }
-        game.getBegin().setWhites(draughts);
-        game.getBegin().setIsWhiteMove(true);
-
-        draughts = new ArrayList<>(draughts);
-        draughts.set(1, (byte)18);
-        ply.getPlyPosition().getPosition().setWhites(draughts);
+        ArrayList<Draught> draughts = new ArrayList<>();
+        ply.getPlyPosition().getPosition().setDraughts(draughts);
         ply.getPlyPosition().getPosition().setIsWhiteMove(false);
 
-        draughts = new ArrayList<>();
-        for (byte i = 1; i <= 12; ++i) {
-            draughts.add(i);
+        for (int i = 21; i <= 32; ++i) {
+            draughts.add(new Draught(true, false, false, i));
         }
-        game.getBegin().setBlacks(draughts);
-        ply.getPlyPosition().getPosition().setBlacks(new ArrayList<>(draughts));
+        for (int i = 1; i <= 12; ++i) {
+            draughts.add(new Draught(false, false, false, i));
+        }
+
+        draughts.get(1).setPosition(18);
     }
-    
+
     private static void setSecondPly(Ply ply) {
         ply.getPlyPosition().setFrom((byte)11);
         ply.getPlyPosition().setTo((byte)16);
@@ -90,49 +95,46 @@ public class GameController {
         ply.getComment().setCommentAfter("after second ply");
         ply.getComment().setRate(PlyRate.DISPUTABLE);
 
-        ArrayList<Byte> draughts = new ArrayList<>();
-        for (byte i = 21; i <= 32; ++i) {
-            draughts.add(i);
-        }
-        draughts.set(1, (byte)18);
-        ply.getPlyPosition().getPosition().setWhites(draughts);
+        ArrayList<Draught> draughts = new ArrayList<>();
+        ply.getPlyPosition().getPosition().setDraughts(draughts);
         ply.getPlyPosition().getPosition().setIsWhiteMove(true);
 
-        draughts = new ArrayList<>();
-        for (byte i = 1; i <= 12; ++i) {
-            draughts.add(i);
+        for (int i = 21; i <= 32; ++i) {
+            draughts.add(new Draught(true, false, false, i));
         }
-        draughts.set(10, (byte)16);
-        ply.getPlyPosition().getPosition().setBlacks(draughts);
+        for (int i = 1; i <= 12; ++i) {
+            draughts.add(new Draught(false, false, false, i));
+        }
+
+        draughts.get(1).setPosition(18);
+        draughts.get(22).setPosition(16);
     }
 
     private static void setThirdPly(Ply ply) {
         ply.getPlyPosition().setFrom((byte)24);
         ply.getPlyPosition().setTo((byte)19);
         ply.getPlyPosition().setPosition(new Position());
-        ply.setNumber((byte)2);
+        ply.setNumber(2);
 
         ply.setComment(new Comment());
         ply.getComment().setCommentBefore("before third ply");
         ply.getComment().setCommentAfter("after third ply");
         ply.getComment().setRate(PlyRate.GOOD);
 
-        ArrayList<Byte> draughts = new ArrayList<>();
-        for (byte i = 21; i <= 32; ++i) {
-            draughts.add(i);
-        }
-        draughts.set(1, (byte)18);
-        draughts.set(3, (byte)19);
-        ply.getPlyPosition().getPosition().setWhites(draughts);
+        ArrayList<Draught> draughts = new ArrayList<>();
+        ply.getPlyPosition().getPosition().setDraughts(draughts);
         ply.getPlyPosition().getPosition().setIsWhiteMove(false);
 
-        draughts = new ArrayList<>();
-        for (byte i = 1; i <= 12; ++i) {
-            draughts.add(i);
+        for (int i = 21; i <= 32; ++i) {
+            draughts.add(new Draught(true, false, false, i));
         }
-        draughts.set(10, (byte)16);
-        ply.getPlyPosition().getPosition().setBlacks(draughts);
+        for (int i = 1; i <= 12; ++i) {
+            draughts.add(new Draught(false, false, false, i));
+        }
 
+        draughts.get(1).setPosition(18);
+        draughts.get(3).setPosition(19);
+        draughts.get(22).setPosition(16);
     }
 
     @RequestMapping(method = RequestMethod.GET)
