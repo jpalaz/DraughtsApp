@@ -8,7 +8,7 @@ import java.util.List;
 public class PlyPosition {
     private byte from;
     private byte to;
-    private List<Byte> intermediats;
+    private List<Integer> intermediates;
     private boolean isBeat;
     private Position position;
 
@@ -20,8 +20,8 @@ public class PlyPosition {
         from = obj.from;
         to = obj.to;
         isBeat = obj.isBeat;
-        if (obj.intermediats != null) {
-            intermediats = new ArrayList<>(obj.intermediats);
+        if (obj.intermediates != null) {
+            intermediates = new ArrayList<>(obj.intermediates);
         }
     }
 
@@ -33,16 +33,16 @@ public class PlyPosition {
         this.position = position;
     }
 
-    public List<Byte> getIntermediats() {
-        return intermediats;
+    public List<Integer> getIntermediates() {
+        return intermediates;
     }
 
-    public void setIntermediats(List<Byte> intermediats) {
-        this.intermediats = intermediats;
+    public void setIntermediates(List<Integer> intermediates) {
+        this.intermediates = intermediates;
     }
 
-    public void addIntermediat(byte intermediat) {
-        intermediats.add(intermediat);
+    public void addIntermediat(int intermediat) {
+        intermediates.add(intermediat);
     }
 
     public void setIsBeat(boolean isBeat) {
